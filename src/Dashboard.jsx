@@ -1,7 +1,10 @@
+import DonutChart from "./DonutChart";
+
 function Dashboard() {
-  return (<div style={{backgroundColor:"honeydew"}}>
+  return (<div>
     <div className="pseudo"></div>
-    <h1 style={{color:"brown"}}>Dashboard</h1>
+    <h1>Dashboard</h1>
+    <DonutChart completed={60} remaining={30} pending={18}/>
     </div>);
 }
 export default Dashboard;
