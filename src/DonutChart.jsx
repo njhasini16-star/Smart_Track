@@ -44,9 +44,9 @@ function DonutChart({completed, pending, remaining}) {
     const angle1 = (remaining/total)*360;
     const angle2 = angle1 + (completed/total)*360;
 
-return(<div className=" m-8 shadow-2xl rounded-2xl w-120">
+return(<div className="mt-8 shadow-2xl rounded-2xl">
       <h1 className="bg-red-200 p-2 text-center rounded-t-2xl">Credit Overview</h1>
-    <div className="bg-yellow-100 p-0 leading-none h-80 flex items-center">
+    <div className="bg-yellow-100 p-0 leading-none h-60 flex items-center">
     <svg xmlns="http://www.w3.org/2000/svg" width="460" height="460" viewBox="-170 -170 500 500">
       {/* Background circle */}
       <circle className="shadow" cx="100" cy="100" r="100" fill="lightblue"/>

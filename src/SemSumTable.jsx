@@ -1,6 +1,6 @@
 function SemSummary({args}) {
   return (
-    <table className="m-8 shadow-2xl w-2/3 rounded-lg overflow-hidden">
+    <table className="shadow-2xl rounded-lg overflow-hidden md:col-span-2">
   <tr className="bg-red-200">
     <td className="rounded-t-lg" colSpan={4}>Semester Summary</td>
   </tr>
