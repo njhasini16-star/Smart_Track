@@ -1,19 +1,19 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import CourseInfo from "./CourseInfo";
-// 
+import { useBasketWise } from "./basketWiseStore.jsx";
  
 function handleSubmitCluster(e, next) {
     e.preventDefault();
     next(true);
 }
 
-function handleSubmitCourse(e, addCourseToSemester, semId, courses, courseIndex, cluster, setShowCluster, setShowCourse, setCluster, setCourse, grade, setGrade) { //
+function handleSubmitCourse(e, addCourseToSemester, semId, courses, courseIndex, cluster, setShowCluster, setShowCourse, setCluster, setCourse, grade, setGrade, setBasketWise ) {
     e.preventDefault();
     const index = parseInt(courseIndex, 10);
     const selectedCourse = courses[cluster][index];
     selectedCourse.grade = grade;
-    // 
+    setBasketWise(prev => ({...prev, [cluster]:[...prev[cluster], selectedCourse]}))
     addCourseToSemester(semId, selectedCourse);
     setShowCluster(false);
     setShowCourse(false);
@@ -22,10 +22,10 @@ function handleSubmitCourse(e, addCourseToSemester, semId, courses, courseIndex,
     setGrade(8);
 }
 
-function handleSubmitNewCourse(e, addCourseToSemester, semId, course, setShowNewCourse, setShowCluster, setNewCourse, setCluster, grade, setGrade) { //
+function handleSubmitNewCourse(e, addCourseToSemester, semId, course, setShowNewCourse, setShowCluster, setNewCourse, setCluster, grade, setGrade, setBasketWise, cluster) { 
     e.preventDefault();
     course.grade = grade;
-    // 
+    setBasketWise(prev => ({...prev, [cluster]:[...prev[cluster], course]}))
     addCourseToSemester(semId, course);
     setShowNewCourse(false);
     setShowCluster(false);
@@ -60,7 +60,7 @@ function SelectCluster({cluster, setCluster, next}) {
     );
 }
 
-function SelectCourse({semId, courses, course, setCourse, cluster, addingNewCourse, setShowCourse, setShowNewCourse, addCourseToSemester, setCluster, setShowCluster, grade, setGrade}) { //
+function SelectCourse({semId, courses, course, setCourse, cluster, addingNewCourse, setShowCourse, setShowNewCourse, addCourseToSemester, setCluster, setShowCluster, grade, setGrade, setBasketWise}) {
     
     const handleChange = (event) => {
         setCourse(event.target.value);
@@ -71,8 +71,7 @@ function SelectCourse({semId, courses, course, setCourse, cluster, addingNewCour
 
     return (<>
         <p>Select Course</p>
-        <form onSubmit={(e) => handleSubmitCourse(e, addCourseToSemester, semId, courses, course, cluster, setShowCluster, setShowCourse, setCluster, setCourse, grade, setGrade)}> 
-            {/* */}
+        <form onSubmit={(e) => handleSubmitCourse(e, addCourseToSemester, semId, courses, course, cluster, setShowCluster, setShowCourse, setCluster, setCourse, grade, setGrade, setBasketWise)}> 
             <select value={course} onChange={handleChange}>
                 {courses[cluster].map((c, idx) => 
                     <option key={idx} value={idx}>{c.code}{" "}{c.name}{" "}({c.credits} credits)</option>
@@ -101,13 +100,12 @@ function SelectCourse({semId, courses, course, setCourse, cluster, addingNewCour
 }
 
 
-function AddNewCourse({newCourse, setNewCourse, addCourseToSemester, semId, setShowNewCourse, setShowCluster, setCluster, grade, setGrade}) { //
+function AddNewCourse({newCourse, setNewCourse, addCourseToSemester, semId, setShowNewCourse, setShowCluster, setCluster, grade, setGrade, setBasketWise, cluster}) {
     const handleChangeGrade = (e) => {
         setGrade(e.target.value);
     }
     return(
-        <form onSubmit={(e) => handleSubmitNewCourse(e, addCourseToSemester, semId, newCourse, setShowNewCourse, setShowCluster, setNewCourse, setCluster, grade, setGrade)}> 
-        {/*  */}
+        <form onSubmit={(e) => handleSubmitNewCourse(e, addCourseToSemester, semId, newCourse, setShowNewCourse, setShowCluster, setNewCourse, setCluster, grade, setGrade, setBasketWise, cluster)}> 
         <label>Course Code:
             <input className="block"
                 type="text" 
@@ -163,7 +161,7 @@ function SemHistory({discipline}) {
     const courses = CourseInfo(discipline);
     const [semesterCourses, setSemesterCourses] = useState({});
     const [grade, setGrade] = useState(8);
-    // 
+    const {basketWise, setBasketWise} = useBasketWise();
 // Add a course to the current semester
 function addCourseToSemester(semId, course) {
   setSemesterCourses(prev => {
@@ -224,13 +222,11 @@ const handleDelete = (idx) => {
         {showCourse && <SelectCourse semId={semId} addCourseToSemester={addCourseToSemester} courses={courses} 
         course={course} addingNewCourse={addingNewCourse} setCourse={setCourse} cluster={cluster} setShowCourse={setShowCourse} 
         setShowNewCourse={setShowNewCourse} setCluster={setCluster} setShowCluster={setShowCluster} grade={grade} setGrade={setGrade}
-        />} 
-        {/* */}
+        setBasketWise={setBasketWise}/>} 
         
         {showNewCourse && <AddNewCourse newCourse={newCourse} setNewCourse={setNewCourse} addCourseToSemester={addCourseToSemester} 
         semId={semId} setShowNewCourse={setShowNewCourse} setShowCluster={setShowCluster} setCluster={setCluster} grade={grade} 
-        setGrade={setGrade} />}
-        {/*  */}
+        setGrade={setGrade} setBasketWise={setBasketWise} cluster={cluster} />}
         
         <table>
             <thead>
