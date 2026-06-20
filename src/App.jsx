@@ -49,8 +49,7 @@ export default function App() {
       <Routes >
         <Route path="/" element={<Dashboard />} />
         <Route path="/basket-tracking" element={<BasketTracking />} />
-        <Route path="/semester-planning" element={<SemesterPlanning />} />
-
+        <Route path="/semester-planning" element={<SemesterPlanning currentSem={3}/>} />
         <Route path="/course-history" element={<CourseHistory currentSem={3}/>} > 
           <Route path=":semId" element={<SemHistory discipline={"CSE"}/>}/>
         </Route>

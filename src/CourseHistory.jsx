@@ -12,8 +12,7 @@ function CourseHistory({currentSem}) {
   <NavLink
     key={i + 1}
     className={`sem-link ${currentSem == i+1 ? "sem-link-current" : currentSem < i+1 ? "sem-link-future" : "" }`}
-    to={`/course-history/semester-${i + 1}`}
-  >
+    to={`/course-history/semester-${i + 1}`}>
     Sem{i + 1}
   </NavLink>
 ))}
