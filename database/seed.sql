@@ -1,3 +1,8 @@
+INSERT INTO users (email, username, discipline_id)
+VALUES
+('hasini@example.com', 'hasini', 4);
+
+
 INSERT INTO baskets (name)
 VALUES
 ('Institute level Courses'),

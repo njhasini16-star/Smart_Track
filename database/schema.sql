@@ -39,7 +39,7 @@ CREATE TABLE user_courses (
     grade VARCHAR(2),
     semester INT NOT NULL,
     status VARCHAR(20) NOT NULL CHECK (status IN ('Planned', 'Completed')),
-
+    basket_id INT,
     PRIMARY KEY (user_id, course_id)
 );
 
