@@ -109,7 +109,7 @@ async function handleDeleteCourse(courseId) {
       <CourseTable courses= {plannedSemesters[selectedSem]} onDelete={handleDeleteCourse}/>
     </div>
     <div className="inline-block lg:block lg:my-3 lg:mx-0">
-      <Search onSelectCourse={handleAddCourse} discipline={'CSE'}/>
+      <Search onSelectCourse={handleAddCourse} discipline={'CSE'} mode="Planned"/>
     </div> 
     </div>
     </div>

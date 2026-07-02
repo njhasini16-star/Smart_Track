@@ -15,36 +15,91 @@ const pool = new Pool({
   port: 5432,
 });
 
-app.get("/completed-courses", async (req, res) => {
+
+
+app.delete("/completed-courses", async (req, res) => {
+  try {
+    const { courseId } = req.body;
+
+    const result = await pool.query(
+      `DELETE FROM user_courses
+       WHERE course_id = $1
+       AND status = 'Completed'
+       RETURNING *;`,
+      [courseId]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "Course not found" });
+    }
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to delete course" });
+  }
+});
+
+app.post("/completed-courses", async (req, res) => {
+  try {
+    const { courseId, semester, basket, grade } = req.body;
+    
+    let basketId;
+    if (basket === "All / Open Electives") {
+      basketId = 8;
+    } else {
+      const result = await pool.query(
+        "SELECT id FROM baskets WHERE name = $1",
+    [basket]
+      );
+      basketId = result.rows[0].id;
+    }
+const query = `
+INSERT INTO user_courses
+    (user_id, course_id, semester, grade, basket_id, status)
+VALUES
+    (1, $1, $2, $4, $3, 'Completed')
+RETURNING *;
+`;
+
+const params = [courseId, semester, basketId, grade];
+
+const result = await pool.query(query, params);
+    
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    console.error(err.detail);
+    res.status(500).json({ error: "Failed to add completed course" });
+  }
+});
+
+app.get("/completed-courses/:semId", async (req, res) => {
+
+  const sem = req.params.semId;
+
   try {
     const result = await pool.query(
-      `SELECT *
-       FROM user_courses
-       WHERE status = 'Completed';`
+      `SELECT 
+      u.course_id AS id,
+      u.grade,
+      b.name AS basket,
+      c.course_code,
+      c.name,
+      c.credits
+      FROM user_courses u
+      JOIN courses c
+        ON u.course_id = c.id
+      JOIN baskets b
+        ON u.basket_id = b.id
+      WHERE u.status = 'Completed' 
+      AND u.semester = $1;`, [sem]
     );
 
     res.json(result.rows);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to fetch completed courses" });
-  }
-});
-
-app.post("/completed-courses", async (req, res) => {
-  try {
-    const { courseId, grade, semester } = req.body;
-
-    const result = await pool.query(
-      `INSERT INTO user_courses (user_id, course_id, grade, semester, status)
-       VALUES (1, $1, $2, $3, 'Completed')
-       RETURNING *`,
-      [courseId, grade, semester]
-    );
-
-    res.status(201).json(result.rows[0]);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to add completed course" });
   }
 });
 
@@ -77,6 +132,17 @@ app.get("/planned-courses/:semester", async (req, res) => {
 app.post("/planned-courses", async (req, res) => {
   try {
     const { courseId, semester, basket } = req.body;
+    
+    let basketId;
+    if (basket === "All / Open Electives") {
+      basketId = 8;
+    } else {
+      const result = await pool.query(
+        "SELECT id FROM baskets WHERE name = $1",
+    [basket]
+      );
+      basketId = result.rows[0].id;
+    }
 
     const result = await pool.query(
       `INSERT INTO user_courses (user_id, course_id, semester, basket_id, status)
@@ -84,12 +150,12 @@ app.post("/planned-courses", async (req, res) => {
          1,
          $1,
          $2,
-         b.id,
+         basketId,
          'Planned'
        FROM baskets b
-       WHERE b.name = $3
+  
        RETURNING *;`,
-      [courseId, semester, basket]
+      [courseId, semester, basketId]
     );
     
     res.status(201).json(result.rows[0]);

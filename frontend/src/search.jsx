@@ -1,11 +1,22 @@
 import { useState, useEffect } from "react";
 
-function Search({discipline, onSelectCourse}) {
+function Search({discipline, onSelectCourse, mode}) {
   const [filters, setFilters] = useState([]);
   const [allCourses, setAllCourses] = useState([]);
   const [search, setSearch] = useState("");
   const [activeFilter, setActiveFilter] = useState("All / Open Electives");
+  const [grades, setGrades] = useState({})
+
+  const gradeslist = ['P', 'A+', 'A', 'A-', 'B', 'B-', 'C', 'C-', 'D', 'D-', 'E', 'E-', 'F'];
   
+  let showGrade;
+  if (mode === "Completed") {
+    showGrade = true;
+  } 
+  if (mode === "Planned") {
+    showGrade = false;
+  }
+
   useEffect(() => {
         async function fetchCourses() {
             try {
@@ -25,8 +36,10 @@ function Search({discipline, onSelectCourse}) {
             const data = await res.json();
             setFilters([
             "All / Open Electives",
-            ...data.map(basket => basket.name)  
-        ]);} catch (err) {
+            ...data
+              .filter(basket => basket.name !== "Open Electives")
+              .map(basket => basket.name)
+              ]);} catch (err) {
           console.error(err);
         }
       } fetchBaskets();}, [])
@@ -46,7 +59,7 @@ function Search({discipline, onSelectCourse}) {
   const matchesSearch =
     course.name.replace(/\s/g, "").toLowerCase().includes(query) ||
     course.course_code?.replace(/\s/g, "").toLowerCase().includes(query);
-   if (activeFilter === 'All / Opene Electives'){
+   if (activeFilter === 'All / Open Electives'){
     return matchesSearch
    }
   return matchesBasket && matchesSearch && matchesDiscipline;
@@ -63,13 +76,42 @@ function Search({discipline, onSelectCourse}) {
       </div>
       <div className="inline-flex flex-col">
       <input type="text" value={search} placeholder="Search Course..." 
-      onChange={(e) => setSearch(e.target.value)} className="w-full ml-auto mr-0 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-teal-500"/>
+      onChange={(e) => setSearch(e.target.value)} 
+      className="w-full ml-auto mr-0 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-teal-500"/>
   
       <ul className="h-70 w-fit overflow-y-auto inline-flex flex-col">
       {query && searchResults.map((course, idx) => (
         <li key={idx} className="w-100 flex flex-col py-2 border-b border-gray-300">
+
           <div className="flex font-medium">{course.course_code || 'TBD'}
-          <button onClick={() => {onSelectCourse(course, activeFilter); setSearch("");}} className="rounded bg-teal-600 ml-auto px-2 text-white text-sm mr-3 ">+ Add to {activeFilter === 'All / Open Electives' ? 'Open electives': activeFilter}</button>
+
+          {showGrade && (<>
+          <span>Grade:</span>
+          <select
+            value={grades[course.id] || "P"}
+            onChange={(e) =>
+    setGrades(prev => ({
+      ...prev,
+      [course.id]: e.target.value
+    }))
+    }>
+            {gradeslist.map( (g) => (
+              <option value={g} key={g}> {g} </option>
+            ))}
+            </select>
+            </>)}
+
+          <button
+  onClick={() => {
+    if (showGrade) {
+      console.log({"course":course});
+      onSelectCourse(course, activeFilter, grades[course.id]||"P");
+    } else {
+      onSelectCourse(course, activeFilter);
+    }
+    setSearch("");
+  }}
+          className="rounded bg-teal-600 ml-auto px-2 text-white text-sm mr-3 ">+ Add to {activeFilter === 'All / Open Electives' ? 'Open electives': activeFilter}</button>
 </div>
 <div className="text-gray-600">{course.name || 'TBD'}</div> 
 </li>

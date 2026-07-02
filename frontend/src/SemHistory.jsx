@@ -1,105 +1,93 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
-import CourseInfo from "./CourseInfo";
-import { useBasketWise } from "./basketWiseStore.jsx";
-
-function AddCourseModal() {
-    
-}
+import CourseTable from "./CourseTable.jsx";
+import Search from "./search.jsx";
 
 function SemHistory({discipline}) {
     const {semId} = useParams();
-    const [showCluster, setShowCluster] = useState(false);
-    const [showCourse, setShowCourse] = useState(false);
-    const [showNewCourse, setShowNewCourse] = useState(false)
-    const [cluster, setCluster] = useState("Institute level Courses");
-    const [course, setCourse] = useState("0");
-    const [newCourse, setNewCourse] = useState({code:"", name:"", credits:""});
-    const courses = CourseInfo(discipline);
-    const [semesterCourses, setSemesterCourses] = useState({});
-    const [grade, setGrade] = useState(8);
-    const {basketWise, setBasketWise} = useBasketWise();
-// Add a course to the current semester
-function addCourseToSemester(semId, course) {
-  setSemesterCourses(prev => {
-    const existing = prev[semId] || [];
-    // check by code (or any unique property)
-    const alreadyAdded = existing.some(c => c.code === course.code);
+    const [completedCourses, setCompletedCourses] = useState({});
 
-    if (alreadyAdded) {
-      return prev; // no change
-    }
-    
-    return {
+  async function fetchCompletedCourses(semId) {
+  try {
+  const res = await fetch( `http://localhost:3000/completed-courses/${semId}`);
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch completed courses for ${semId}`);
+  }
+
+  const data = await res.json();
+
+  setCompletedCourses(prev => ({
       ...prev,
-      [semId]: [...existing, course]
-    };
-  });
+      [semId]: data,
+    }));
+  } catch(err) {
+    console.error(err);
+  }
 }
 
-
-    useEffect(() => {
-    setShowCluster(false);
-    setShowCourse(false);
-    setShowNewCourse(false);
-    setCluster("Institute level Courses");
-    setCourse("0")
-    setGrade(8);
-    setNewCourse({code:"", name:"", credits:""})
-  }, [semId]);
-    
-    function addCluster() {
-        setShowCluster(true);
-    }
-    function addingNewCourse(current, next) {
-    next(true);
-    current(false);
-}
 useEffect(() => {
-  console.log("Updated semesterCourses:", semesterCourses[semId]);
-}, [semesterCourses, semId]);
+  fetchCompletedCourses(semId);
+}, [semId]);  
 
-const handleDelete = (idx) => {
-    setSemesterCourses((prev) => {
-      const updated = { ...prev };
-      const updatedCourses = [...(updated[semId] || [])];
-      updatedCourses.splice(idx, 1);
-      updated[semId] = updatedCourses;
-      return updated;
+  async function handleAddCourse(course, activeFilter, grade) {
+    try {
+      console.log({
+        courseId: course.id,
+        courseCode: course.course_code,
+        courseName: course.name,
+        basket: activeFilter,
+        grade: grade
+});
+      const res = await fetch("http://localhost:3000/completed-courses", {
+        method: "POST",
+        headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId: 1,
+        courseId: course.id,
+        semester: semId,
+        basket: activeFilter,
+        grade: grade
+      }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to add course");
+      }
+      await fetchCompletedCourses(semId);
+
+    } catch(err) {
+      console.error(err);
+    }}
+
+  async function handleDeleteCourse(courseId) {
+  try {
+    const res = await fetch("http://localhost:3000/completed-courses", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        courseId: courseId
+      }),
     });
-  };
 
-  const existing = semesterCourses[semId] || [];
+    if (!res.ok) {
+        throw new Error("Failed to delete course");
+      }
+      await fetchCompletedCourses(semId);
+    } catch(err) {
+      console.error(err);
+    }}
+  
 
     return (<div className="mx-8">
         <h1 className="mb-8">This is {semId}</h1>
-        <button className="bg-blue-600 px-2" onClick={addCluster}>+ Add</button>
         
-        <table>
-            <thead>
-        <tr>
-            <th>Course Code</th>
-            <th>Name</th>
-            <th>Credits</th>
-            <th>Grade</th>
-        </tr>
-        </thead>
-        <tbody>
-            {semesterCourses[semId]?.length > 0 ? (semesterCourses[semId].map((course, idx) => <tr key={idx}>
-            <td >{course.code}</td>
-            <td >{course.name}</td>
-            <td >{course.credits}</td>
-            <td >{course.grade}</td>
-            <td><button onClick={() => handleDelete(idx) }>Delete</button></td>
-            </tr>)) : (
-          <tr>
-            <td colSpan="4" style={{ textAlign: "center" }}>
-              No courses added yet
-            </td>
-          </tr>
-        )}
-        </tbody>
-        </table>
+        <CourseTable courses= {completedCourses[semId] || []} onDelete={handleDeleteCourse}/>
+        <Search onSelectCourse={handleAddCourse} discipline={discipline} mode="Completed"/>
         </div>
     );
 }
