@@ -48,7 +48,7 @@ export default function App() {
       <BasketWiseProvider>
       <Routes >
         <Route path="/" element={<Dashboard />} />
-        <Route path="/basket-tracking" element={<BasketTracking />} />
+        <Route path="/basket-tracking" element={<BasketTracking discipline={"CSE"}/>} />
         <Route path="/semester-planning" element={<SemesterPlanning currentSem={3}/>} />
         <Route path="/course-history" element={<CourseHistory currentSem={3}/>} > 
           <Route path=":semId" element={<SemHistory discipline={"CSE"}/>}/>

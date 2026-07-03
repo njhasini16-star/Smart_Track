@@ -15,7 +15,30 @@ const pool = new Pool({
   port: 5432,
 });
 
+app.get("/completed-courses", async (req, res) => {
 
+  try {
+    const result = await pool.query(`
+      SELECT 
+      u.course_id,
+      u.semester,
+      c.course_code,
+      c.name,
+      c.credits,
+      u.grade,
+      b.name AS basket
+      FROM user_courses u
+      JOIN courses c
+      ON u.course_id = c.id
+      JOIN baskets b
+      ON u.basket_id = b.id
+
+      WHERE u.status = 'Completed'`);
+      res.json(result.rows);
+  } catch(err) {
+    console.error(err);
+  }
+})
 
 app.delete("/completed-courses", async (req, res) => {
   try {
@@ -145,18 +168,13 @@ app.post("/planned-courses", async (req, res) => {
     }
 
     const result = await pool.query(
-      `INSERT INTO user_courses (user_id, course_id, semester, basket_id, status)
-       SELECT
-         1,
-         $1,
-         $2,
-         basketId,
-         'Planned'
-       FROM baskets b
-  
-       RETURNING *;`,
-      [courseId, semester, basketId]
-    );
+  `INSERT INTO user_courses
+    (user_id, course_id, semester, basket_id, status)
+   VALUES
+    (1, $1, $2, $3, 'Planned')
+   RETURNING *`,
+  [courseId, semester, basketId]
+);
     
     res.status(201).json(result.rows[0]);
   } catch (err) {

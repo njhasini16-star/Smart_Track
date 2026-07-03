@@ -1,18 +1,81 @@
-import { useBasketWise } from "./basketWiseStore.jsx";
-import CourseInfo from "./CourseInfo.jsx"
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-const courses = CourseInfo("CSE");
+function BasketTracking({discipline}) {
+
+  const [selectedBasket, setSelectedBasket] = useState("Discipline Electives");
+  const [courses, setCourses] = useState({});
+  const [completedCourses, setCompletedCourses] = useState({});
+
+async function  fetchCourses(discipline) {
+  try {
+  const res = await fetch(`http://localhost:3000/courses`);
+
+  if (!res.ok) {
+    throw new Error(`HTTP error! Status: ${res.status}`);
+  }
+
+  let data = await res.json();
+  data = data.filter(course => !course.discipline || course.discipline === discipline)
+  const grouped = {};
+
+  data.forEach(course => {
+    course.baskets.forEach(basket => {
+      grouped[basket] = [...(grouped[basket] || []), course];
+  });
+});
+
+  setCourses(grouped);
+
+  } catch(err) {
+    console.error(err);
+  }
+}
+
+async function fetchBasketWiseCourses() {
+  try {
+  const res = await fetch(`http://localhost:3000/completed-courses`);
+
+  if (!res.ok) {
+    throw new Error(`HTTP error! Status: ${res.status}`);
+  }
+
+  const data = await res.json();
+  
+  const grouped = {};
+
+  data.forEach(course => {
+    grouped[course.basket] = [...(grouped[course.basket] || []), course];
+  });
+
+setCompletedCourses(grouped);
+
+  } catch(err) {
+    console.error(err);
+  }
+}
+
+useEffect(() => 
+  {fetchBasketWiseCourses();
+    fetchCourses(discipline);
+  },
+[discipline])
+
+const baskets = ["Institute level Courses", "Discipline Core Courses", "Discipline Electives",
+  "Open Electives", "Science Basket", "Math Basket", "Materials Basket", "HSS Basket"
+]
 
 const basketTotalCredits = {"Institute level Courses":31, "Discipline Core Courses":30, 
   "Discipline Electives":30, "Open Electives":20, "Science Basket":8, "Math Basket":10, 
   "Materials Basket":3, "HSS Basket":20};
 
-function Card({basket, basketWise, basketCredits, onClick, selectedBasket}) {
+function Card({basket, onClick, selectedBasket}) {
+  
+  const basketCourses = completedCourses[basket] || [];
 
-  const completedCredits = basketWise[basket].length > 0 ? 
-  basketWise[basket].map(course => Number(course.credits)).reduce((acc, credits) => acc + credits, 0) : 0;
-  const percentage = (completedCredits/basketCredits)*100;
+  const completedCredits = basketCourses.length > 0 ? 
+  basketCourses.map(course => Number(course.credits)).reduce((acc, credits) => acc + credits, 0) : 0;
+  
+  const percentage = (completedCredits/basketTotalCredits[basket])*100;
   let rounded = percentage.toFixed(2);
 
   let colour;
@@ -31,22 +94,28 @@ function Card({basket, basketWise, basketCredits, onClick, selectedBasket}) {
     <div className="text-lg mb-1">{rounded}% Completed</div>
 
     <div className={`inline-flex h-4 flex-shrink-0 ${percentage >= 100 ? "rounded-full" : "rounded-l-full"}`} 
-    style={{width:`${((completedCredits/basketCredits)*45)*4}px`, backgroundColor:`${colour}`}}></div>
+    style={{width:`${((completedCredits/basketTotalCredits[basket])*45)*4}px`, backgroundColor:`${colour}`}}></div>
 
-    <div className={`inline-flex bg-slate-300 h-4 flex-shrink-0 mr-2 ${percentage === 0 ? "rounded-full" : "rounded-r-full"}`} style={{width:`${(45-(completedCredits/basketCredits)*45)*4}px`}}></div>
-    <div >{completedCredits}/{basketCredits} Credits</div>
+    <div className={`inline-flex bg-slate-300 h-4 flex-shrink-0 mr-2 ${percentage === 0 ? "rounded-full" : "rounded-r-full"}`} style={{width:`${(45-(completedCredits/basketTotalCredits[basket])*45)*4}px`}}></div>
+    <div >{completedCredits}/{basketTotalCredits[basket]} Credits</div>
   </div>
   );
 }
 
-function BasketDetails({basket, basketWise}) {
-  const completedCredits = basketWise[basket].length > 0 ? 
-  basketWise[basket].map(course => Number(course.credits)).reduce((acc, credits) => acc + credits, 0) : 0;
+function BasketDetails({basket}) {
+
+  const completedBasketCourses = completedCourses[basket] || [];
+  
+  const completedCredits = completedBasketCourses.length > 0 ? 
+  completedBasketCourses.map(course => 
+    Number(course.credits)).reduce((acc, credits) => acc + credits, 0) : 0;
+  
+  const basketCourses = courses[basket] || [];
   const remainingCredits = basketTotalCredits[basket] - completedCredits;
-  let remaining = courses[basket].filter(
+  let remaining = basketCourses.filter(
   course =>
-    !basketWise[basket].some(
-      completed => completed.code === course.code
+    !completedBasketCourses.some(
+      completed => completed.course_code === course.course_code
     )
 );
   return( <>
@@ -68,9 +137,9 @@ function BasketDetails({basket, basketWise}) {
       </tr>
       </thead>
       <tbody>
-        {basketWise[basket]?.length > 0 ? 
-  basketWise[basket].map((course, idx) => <tr key = {idx}>
-    <td className="whitespace-nowrap !px-4 !py-3 text-center">{course.code}</td>
+        {completedCourses[basket]?.length > 0 ? 
+  completedCourses[basket].map((course, idx) => <tr key = {idx}>
+    <td className="whitespace-nowrap !px-4 !py-3 text-center">{course.course_code}</td>
     <td className="!px-4 !py-3">{course.name}</td>
     <td className="!px-4 !py-3 text-center">{course.credits}</td>
     <td className="!px-4 !py-3 text-center">{course.grade}</td>
@@ -91,7 +160,7 @@ function BasketDetails({basket, basketWise}) {
       <tbody>
         {remaining.length > 0 ? 
   remaining.map((course, idx) => <tr key = {idx}>
-    <td className="whitespace-nowrap !px-4 !py-3 text-center">{course.code}</td>
+    <td className="whitespace-nowrap !px-4 !py-3 text-center">{course.course_code}</td>
     <td className="!px-4 !py-3 ">{course.name}</td>
     <td className="!px-4 !py-3 text-center">{course.credits}</td>
   </tr> ) : <tr><td className="text-center" colSpan={3}>No courses remaining</td></tr>}
@@ -103,28 +172,17 @@ function BasketDetails({basket, basketWise}) {
   );
 }
 
-function BasketTracking() {
-  const { basketWise } = useBasketWise();
-  console.log(basketWise);
-
-  const [selectedBasket, setSelectedBasket] = useState("Discipline Electives");
-
   return (<div className="lg:ml-55 xl:ml-60">
     <div className="mx-3 lg:ml-0 xl:ml-0 xl:mr-7">
     <div className="pseudo"></div>
     <h1 className="text-3xl font-bold my-3">Basket-Tracking</h1>
       
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 md:gap-3 sm:gap-6 gap-4">
-      <Card onClick={() => setSelectedBasket("Open Electives")} basket={"Open Electives"} basketWise={basketWise} basketCredits={20} selectedBasket={selectedBasket}/>
-      <Card onClick={() => setSelectedBasket("Institute level Courses")} basket={"Institute level Courses"} basketWise={basketWise} basketCredits={31} selectedBasket={selectedBasket}/>
-      <Card onClick={() => setSelectedBasket("Discipline Core Courses")} basket={"Discipline Core Courses"} basketWise={basketWise} basketCredits={30} selectedBasket={selectedBasket}/>
-      <Card onClick={() => setSelectedBasket("Discipline Electives")} basket={"Discipline Electives"} basketWise={basketWise} basketCredits={36} selectedBasket={selectedBasket}/>
-      <Card onClick={() => setSelectedBasket("Science Basket")} basket={"Science Basket"} basketWise={basketWise} basketCredits={8} selectedBasket={selectedBasket}/>
-      <Card onClick={() => setSelectedBasket("Math Basket")} basket={"Math Basket"} basketWise={basketWise} basketCredits={10} selectedBasket={selectedBasket}/>
-      <Card onClick={() => setSelectedBasket("Materials Basket")} basket={"Materials Basket"} basketWise={basketWise} basketCredits={3} selectedBasket={selectedBasket}/>
-      <Card onClick={() => setSelectedBasket("HSS Basket")} basket={"HSS Basket"} basketWise={basketWise} basketCredits={20} selectedBasket={selectedBasket}/>
+        {baskets.map(basket => 
+          <Card key={basket} onClick={() => setSelectedBasket(basket)} basket={basket} selectedBasket={selectedBasket}/>
+        )}
       </div>
-      <BasketDetails basket={selectedBasket} basketWise={basketWise}/>
+      <BasketDetails basket={selectedBasket}/>
       </div>
     </div>);
 }
