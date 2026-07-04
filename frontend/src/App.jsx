@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import { NavLink } from "react-router-dom";
-import { BasketWiseProvider } from "./basketWiseStore.jsx";
 
 import Dashboard from "./Dashboard"
 import BasketTracking from "./BasketTracking"
@@ -45,7 +44,6 @@ export default function App() {
           COURSE HISTORY
           </NavLink>
       </nav>
-      <BasketWiseProvider>
       <Routes >
         <Route path="/" element={<Dashboard discipline={"CSE"}/>} />
         <Route path="/basket-tracking" element={<BasketTracking discipline={"CSE"}/>} />
@@ -54,7 +52,6 @@ export default function App() {
           <Route path=":semId" element={<SemHistory discipline={"CSE"}/>}/>
         </Route>
       </Routes>
-      </BasketWiseProvider>
     </BrowserRouter>
 );
 }

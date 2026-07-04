@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { getAllCompletedCourses } from "./api/completedCourses";
+import { getCourses } from "./api/courses";
 
 function BasketTracking({discipline}) {
 
@@ -8,13 +10,8 @@ function BasketTracking({discipline}) {
 
 async function  fetchCourses(discipline) {
   try {
-  const res = await fetch(`http://localhost:3000/courses`);
+  let data = await getCourses();
 
-  if (!res.ok) {
-    throw new Error(`HTTP error! Status: ${res.status}`);
-  }
-
-  let data = await res.json();
   data = data.filter(course => !course.discipline || course.discipline === discipline)
   const grouped = {};
 
@@ -33,13 +30,7 @@ async function  fetchCourses(discipline) {
 
 async function fetchBasketWiseCourses() {
   try {
-  const res = await fetch(`http://localhost:3000/completed-courses`);
-
-  if (!res.ok) {
-    throw new Error(`HTTP error! Status: ${res.status}`);
-  }
-
-  const data = await res.json();
+  const data = await getAllCompletedCourses();
   
   const grouped = {};
 

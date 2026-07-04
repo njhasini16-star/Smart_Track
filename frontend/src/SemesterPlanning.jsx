@@ -1,11 +1,15 @@
 import { useState, useEffect } from "react";
 import Search from "./search";
 import CourseTable from "./CourseTable";
+import { getPlannedCourses, addPlannedCourse, deletePlannedCourse } from "./api/PlannedCourses";
 
 function SemesterPlanning({currentSem}) {
+
   const [selectedSem, setSelectedSem] = useState(currentSem+1)
+
   const [plannedSemesters, setPlannedSemesters] = useState(() => {
     const semesters = {};
+
   for (let sem = currentSem + 1; sem <= 8; sem++) {
     semesters[sem] = [];}
   return semesters;
@@ -14,80 +18,47 @@ function SemesterPlanning({currentSem}) {
   const isPlanned = sem => plannedSemesters[sem].length>0;
   
   const creditLoad = plannedSemesters[selectedSem].reduce((sum, course) => sum+course.credits, 0);
-  console.log(plannedSemesters)
   
-  async function fetchPlannedCourses(semester) {
+  async function fetchPlannedCourses() {
   try {
-    const res = await fetch(
-      `http://localhost:3000/planned-courses/${semester}`
-    );
 
-    if (!res.ok) {
-      throw new Error("Failed to fetch planned courses");
-    }
-
-    const data = await res.json();
+    const data = await getPlannedCourses(selectedSem);
 
     setPlannedSemesters(prev => ({
       ...prev,
-      [semester]: data,
+      [selectedSem]: data,
     }));
+
   } catch (err) {
     console.error(err);
-    res.status(500).json({
-    error: err.message,
-  });
   }
 }
 
   useEffect(() => {
-  fetchPlannedCourses(selectedSem);
+  fetchPlannedCourses();
 }, [selectedSem]);
 
   async function handleAddCourse(course, activeFilter) {
     try {
-      const res = await fetch("http://localhost:3000/planned-courses", {
-        method: "POST",
-        headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        userId: 1,
+      
+      await addPlannedCourse({
         courseId: course.id,
         semester: selectedSem,
         basket: activeFilter
-      }),
-      });
+      })
 
-      if (!res.ok) {
-        throw new Error("Failed to add course");
-      }
-      await fetchPlannedCourses(selectedSem);
+      await fetchPlannedCourses();
     } catch(err) {
       console.error(err);
     }}
 
 async function handleDeleteCourse(courseId) {
   try {
-    const res = await fetch("http://localhost:3000/planned-courses", {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        courseId: courseId
-      }),
-    });
-
-    if (!res.ok) {
-        throw new Error("Failed to delete course");
-      }
-      await fetchPlannedCourses(selectedSem);
+      await deletePlannedCourse(courseId);
+      await fetchPlannedCourses();
     } catch(err) {
       console.error(err);
     }}
-  
-
   
   return (
     <div className="lg:ml-60 mx-3">

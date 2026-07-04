@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import DonutChart from "./DonutChart";
 import SemSummary from "./SemSumTable";
 import AcademicProgress from "./AcademicProgress";
+import { getAllCompletedCourses } from "./api/completedCourses";
+import { getAllPlannedCourses } from "./api/PlannedCourses";
 
 function Dashboard({discipline}) {
 
@@ -18,12 +20,7 @@ function Dashboard({discipline}) {
 
   async function fetchCompletedCourses() {
   try {
-  const res = await fetch("http://localhost:3000/completed-courses");
-
-  if (!res.ok) {
-    throw new Error(`Failed to fetch completed courses`);
-  }
-  const data = await res.json();
+  const data = await getAllCompletedCourses();
 
   const grouped = {};
 
@@ -49,13 +46,7 @@ data.forEach(course => {
   
   async function fetchPlannedCredits() {
   try {
-  const res = await fetch("http://localhost:3000/planned-courses");
-
-  if (!res.ok) {
-    throw new Error(`Failed to fetch planned courses`);
-  }
-
-  const data = await res.json();
+  const data = await getAllPlannedCourses();
 
   const totalSum = data.reduce((sum, course) => sum + Number(course.credits), 0);
 

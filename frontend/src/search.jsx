@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { getCourses } from "./api/courses";
 
 function Search({discipline, onSelectCourse, mode}) {
   const [filters, setFilters] = useState([]);
@@ -16,13 +17,12 @@ function Search({discipline, onSelectCourse, mode}) {
   if (mode === "Planned") {
     showGrade = false;
   }
-
+  
   useEffect(() => {
         async function fetchCourses() {
             try {
-            const res = await fetch("http://localhost:3000/courses");
-            const data = await res.json();
-            console.log(allCourses);
+            const data = await getCourses();
+  
             setAllCourses(data);
             
         } catch (err) {
