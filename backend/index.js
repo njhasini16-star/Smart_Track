@@ -126,6 +126,29 @@ app.get("/completed-courses/:semId", async (req, res) => {
   }
 });
 
+app.get("/planned-courses", async (req, res) => {
+  
+  try {
+    const result = await pool.query(
+      `SELECT 
+      u.course_id AS id,
+      b.name AS basket,
+      c.course_code,
+      c.name,
+      c.credits
+      FROM user_courses u
+      JOIN courses c
+        ON u.course_id = c.id
+      JOIN baskets b
+        ON u.basket_id = b.id
+      WHERE u.status = 'Planned';`
+    );
+    res.json(result.rows);
+  } catch(err) {
+    console.error(err);
+  }
+});
+
 app.get("/planned-courses/:semester", async (req, res) => {
   
   const sem = req.params.semester;

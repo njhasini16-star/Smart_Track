@@ -64,9 +64,49 @@ const baskets = ["Institute level Courses", "Discipline Core Courses", "Discipli
   "Open Electives", "Science Basket", "Math Basket", "Materials Basket", "HSS Basket"
 ]
 
-const basketTotalCredits = {"Institute level Courses":31, "Discipline Core Courses":30, 
-  "Discipline Electives":30, "Open Electives":20, "Science Basket":8, "Math Basket":10, 
+const basketTotalCredits = {"Institute level Courses":31, 
+  "Open Electives":20, "Science Basket":8, "Math Basket":10, 
   "Materials Basket":3, "HSS Basket":20};
+
+  if (discipline === "AI") {
+    basketTotalCredits["Discipline Core Courses"] = 44;
+    basketTotalCredits["Discipline Electives"] = 24;
+  }
+
+  if (discipline === "CL") {
+    basketTotalCredits["Discipline Core Courses"] = 42;
+    basketTotalCredits["Discipline Electives"] = 24;
+  }
+
+  if (discipline === "CE") {
+    basketTotalCredits["Discipline Core Courses"] = 42;
+    basketTotalCredits["Discipline Electives"] = 24;
+  }
+
+  if (discipline === "CSE") {
+    basketTotalCredits["Discipline Core Courses"] = 36;
+    basketTotalCredits["Discipline Electives"] = 30;
+  }
+
+  if (discipline === "EE") {
+    basketTotalCredits["Discipline Core Courses"] = 43;
+    basketTotalCredits["Discipline Electives"] = 24;
+  }
+  
+  if (discipline === "ICDT") {
+    basketTotalCredits["Discipline Core Courses"] = 44;
+    basketTotalCredits["Discipline Electives"] = 24;
+  }
+
+  if (discipline === "MSE") {
+    basketTotalCredits["Discipline Core Courses"] = 42;
+    basketTotalCredits["Discipline Electives"] = 24;
+  }
+
+  if (discipline === "ME") {
+    basketTotalCredits["Discipline Core Courses"] = 44;
+    basketTotalCredits["Discipline Electives"] = 24;
+  }
 
 function Card({basket, onClick, selectedBasket}) {
   
