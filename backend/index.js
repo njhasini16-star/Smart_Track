@@ -272,14 +272,6 @@ app.get('/baskets', async (req, res) => {
     }
 });
 
-app.get('/courses/semesters/:semId/planned-courses', (req,res) => {
-    const semId = req.params.semId;
-    res.send(`Here, planned courses for semester-${semId} can be accessed!`)
-})
-app.get('/courses/semesters/:semId/completed-courses', (req,res) => {
-    const semId = req.params.semId;
-    res.send(`Here, completed courses for semester-${semId} can be accessed!`)
-})
 app.listen(port, () => {
     console.log(`My express server is finally setup on port ${port}!`)
 })

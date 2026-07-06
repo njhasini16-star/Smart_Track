@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import DonutChart from "./DonutChart";
-import SemSummary from "./SemSumTable";
-import AcademicProgress from "./AcademicProgress";
-import { getAllCompletedCourses } from "./api/completedCourses";
-import { getAllPlannedCourses } from "./api/PlannedCourses";
+import DonutChart from "../components/DonutChart";
+import SemSummary from "../components/SemSumTable";
+import AcademicProgress from "../components/AcademicProgress";
+import { getAllCompletedCourses } from "../api/completedCourses";
+import { getAllPlannedCourses } from "../api/PlannedCourses";
 
 function Dashboard({discipline}) {
 

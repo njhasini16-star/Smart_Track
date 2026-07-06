@@ -1,8 +1,8 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
-import CourseTable from "./CourseTable.jsx";
-import Search from "./search.jsx";
-import { getCompletedCourses, addCompletedCourse, deleteCompletedCourse } from "./api/completedCourses.js";
+import CourseTable from "../components/CourseTable.jsx";
+import Search from "../components/search.jsx";
+import { getCompletedCourses, addCompletedCourse, deleteCompletedCourse } from "../api/completedCourses.js";
 
 function SemHistory({discipline}) {
     const {semId} = useParams();

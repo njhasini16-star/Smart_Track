@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import Search from "./search";
-import CourseTable from "./CourseTable";
-import { getPlannedCourses, addPlannedCourse, deletePlannedCourse } from "./api/PlannedCourses";
+import Search from "../components/search";
+import CourseTable from "../components/CourseTable";
+import { getPlannedCourses, addPlannedCourse, deletePlannedCourse } from "../api/PlannedCourses";
 
 function SemesterPlanning({currentSem}) {
 

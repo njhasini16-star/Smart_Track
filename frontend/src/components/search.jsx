@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getCourses } from "./api/courses";
+import { getCourses } from "../api/courses";
 
 function Search({discipline, onSelectCourse, mode}) {
   const [filters, setFilters] = useState([]);

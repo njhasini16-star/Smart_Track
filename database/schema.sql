@@ -13,7 +13,8 @@ CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     username TEXT UNIQUE NOT NULL,
     email TEXT UNIQUE NOT NULL,
-    discipline_id INT REFERENCES disciplines(id)
+    discipline_id INT REFERENCES disciplines(id),
+    password_hash TEXT NOT NULL
 );
 
 CREATE TABLE courses (

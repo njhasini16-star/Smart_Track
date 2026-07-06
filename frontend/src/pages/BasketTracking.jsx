@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { getAllCompletedCourses } from "./api/completedCourses";
-import { getCourses } from "./api/courses";
+import { getAllCompletedCourses } from "../api/completedCourses";
+import { getCourses } from "../api/courses";
 
 function BasketTracking({discipline}) {
 

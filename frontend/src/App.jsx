@@ -1,11 +1,11 @@
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { NavLink } from "react-router-dom";
 
-import Dashboard from "./Dashboard"
-import BasketTracking from "./BasketTracking"
-import SemesterPlanning from "./SemesterPlanning"
-import CourseHistory from "./CourseHistory"
-import SemHistory from './SemHistory';
+import Dashboard from "./pages/Dashboard"
+import BasketTracking from "./pages/BasketTracking"
+import SemesterPlanning from "./pages/SemesterPlanning"
+import CourseHistory from "./pages/CourseHistory"
+import SemHistory from './pages/SemHistory';
 
 export default function App() {
 
