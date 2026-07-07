@@ -1,6 +1,10 @@
 const cors = require("cors");
 const express = require('express');
 const app = express();
+
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
+
 const port = 3000;
 const { Pool } = require('pg');
 
@@ -15,6 +19,78 @@ const pool = new Pool({
   port: 5432,
 });
 
+app.post("/register", async (req, res) =>{
+  try {
+    const { username, email, password, disciplineId } = req.body;
+    const hashed_password = await bcrypt.hash(password, saltRounds);
+
+    const normalisedEmail = email.trim().toLowerCase();
+    const normalizedUsername = username.trim();
+    
+    if (!normalisedEmail.endsWith("@iitgn.ac.in")) {
+    return res.status(400).json({
+        error: "Only IITGN email addresses are allowed."
+    });
+    }
+
+    if (!normalizedUsername) {
+      return res.status(400).json({
+        error: "username required"
+    });
+    }
+    if (password.length < 8) {
+      return res.status(400).json({
+        error: "password should have at least 8 characters"
+    })
+    }
+    
+    if (!disciplineId) {
+      return res.status(400).json({
+        error: "discipline required"
+      });
+    }
+
+    const result = await pool.query(`
+      INSERT INTO users (username, email, discipline_id, password_hash)
+      VALUES ($1, $2, $3, $4)
+      RETURNING id, username, email, discipline_id;`, [normalizedUsername, normalisedEmail, disciplineId, hashed_password])
+
+      res.status(201).json(result.rows[0]);
+
+  } catch(err) {
+    if (err.code === "23505") {
+      if (err.constraint === "users_email_key") {
+        return res.status(409).json({
+          error: "email already exists"
+        });
+      }
+      if (err.constraint === "users_username_key") {
+        return res.status(409).json({
+          error: "username already exists"
+        });
+      }
+    }
+
+    console.error(err);
+
+    return res.status(500).json({
+    error: "Internal server error"
+    });
+  }
+})
+
+app.get("/disciplines", async (req, res) => {
+  
+  try {
+    const result = await pool.query(`
+      SELECT * FROM disciplines;`);
+    res.json(result.rows);
+
+  } catch(err) {
+    console.error(err);
+  }
+
+})
 app.get("/completed-courses", async (req, res) => {
 
   try {
