@@ -26,42 +26,85 @@ const pool = new Pool({
 
 const JWT_secret = process.env.JWT_secret;
 
+const authenticateJWT = (req, res, next) => {
+     const token = req.cookies.token;
+
+     if (!token) {
+       return res.status(401).json({ message: 'Token missing' });
+     }
+
+     try {
+   const decoded = jwt.verify(token, JWT_secret);
+   req.user = decoded;
+
+   next();
+ } catch (error) {
+   return res.status(403).json({ message: 'Invalid or expired token' });
+ }
+};
+
+
 app.post("/login", async (req, res) => {
-  const {email, password} = req.body;
+  const { email, password } = req.body;
 
   try {
     const normalisedEmail = email.trim().toLowerCase();
 
-    const result = await pool.query(`
-      SELECT * FROM users
-      WHERE email = $1;`, [normalisedEmail]);
+    const result = await pool.query(
+      `SELECT id, discipline_id, password_hash
+       FROM users
+       WHERE email = $1;`,
+      [normalisedEmail]
+    );
 
     if (!result.rows[0]) {
       return res.status(401).json({
-        error: "Invalid email or password"
-      })
+        error: "Invalid email or password",
+      });
     }
+
     const hashedPassword = result.rows[0].password_hash;
 
     const passwordMatch = await bcrypt.compare(password, hashedPassword);
 
     if (!passwordMatch) {
-      return res.status(401).json({ error: 'Invalid email or password' });
+      return res.status(401).json({
+        error: "Invalid email or password",
+      });
     }
+
     const payload = {
       id: result.rows[0].id,
       disciplineId: result.rows[0].discipline_id,
+    };
+
+    if (!JWT_secret) {
+      throw new Error("JWT_SECRET is not defined");
     }
 
-    const token = jwt.sign(payload, JWT_secret, { expiresIn: '7d' });
+    const token = jwt.sign(payload, JWT_secret, {
+      expiresIn: "7d",
+    });
 
-    res.status(200).json({message: "User logged in successfully"});
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
 
-  } catch(err) {
+    res.status(200).json({
+      message: "User logged in successfully",
+    });
+
+  } catch (err) {
     console.error(err);
-    res.status(500).json({error: "Internal server error"})
+    res.status(500).json({
+      error: "Internal server error",
+    });
   }
-})
+});
+
 app.get("/users", async(req, res) => {
   try {
     const result = await pool.query(`
@@ -144,8 +187,8 @@ app.get("/disciplines", async (req, res) => {
   }
 
 })
-app.get("/completed-courses", async (req, res) => {
-
+app.get("/completed-courses", authenticateJWT, async (req, res) => {
+  const userId = req.user.id;
   try {
     const result = await pool.query(`
       SELECT 
@@ -161,24 +204,26 @@ app.get("/completed-courses", async (req, res) => {
       ON u.course_id = c.id
       JOIN baskets b
       ON u.basket_id = b.id
-
-      WHERE u.status = 'Completed'`);
+      WHERE u.status = 'Completed'
+      AND u.user_id = $1`, [userId]);
       res.json(result.rows);
   } catch(err) {
     console.error(err);
   }
 })
 
-app.delete("/completed-courses", async (req, res) => {
+app.delete("/completed-courses", authenticateJWT, async (req, res) => {
   try {
     const { courseId } = req.body;
+    const userId = req.user.id;
 
     const result = await pool.query(
       `DELETE FROM user_courses
        WHERE course_id = $1
        AND status = 'Completed'
+       AND user_id = $2
        RETURNING *;`,
-      [courseId]
+      [courseId, userId]
     );
 
     if (result.rowCount === 0) {
@@ -192,9 +237,10 @@ app.delete("/completed-courses", async (req, res) => {
   }
 });
 
-app.post("/completed-courses", async (req, res) => {
+app.post("/completed-courses", authenticateJWT, async (req, res) => {
   try {
     const { courseId, semester, basket, grade } = req.body;
+    const userId = req.user.id;
     
     let basketId;
     if (basket === "All / Open Electives") {
@@ -210,11 +256,11 @@ const query = `
 INSERT INTO user_courses
     (user_id, course_id, semester, grade, basket_id, status)
 VALUES
-    (1, $1, $2, $4, $3, 'Completed')
+    ($5, $1, $2, $4, $3, 'Completed')
 RETURNING *;
 `;
 
-const params = [courseId, semester, basketId, grade];
+const params = [courseId, semester, basketId, grade, userId];
 
 const result = await pool.query(query, params);
     
@@ -226,9 +272,10 @@ const result = await pool.query(query, params);
   }
 });
 
-app.get("/completed-courses/:semId", async (req, res) => {
+app.get("/completed-courses/:semId", authenticateJWT, async (req, res) => {
 
   const sem = req.params.semId;
+  const userId = req.user.id;
 
   try {
     const result = await pool.query(
@@ -245,7 +292,8 @@ app.get("/completed-courses/:semId", async (req, res) => {
       JOIN baskets b
         ON u.basket_id = b.id
       WHERE u.status = 'Completed' 
-      AND u.semester = $1;`, [sem]
+      AND u.semester = $1
+      AND u.user_id = $2;`, [sem, userId]
     );
 
     res.json(result.rows);
@@ -255,8 +303,8 @@ app.get("/completed-courses/:semId", async (req, res) => {
   }
 });
 
-app.get("/planned-courses", async (req, res) => {
-  
+app.get("/planned-courses", authenticateJWT, async (req, res) => {
+  const userId = req.user.id;
   try {
     const result = await pool.query(
       `SELECT 
@@ -270,7 +318,8 @@ app.get("/planned-courses", async (req, res) => {
         ON u.course_id = c.id
       JOIN baskets b
         ON u.basket_id = b.id
-      WHERE u.status = 'Planned';`
+      WHERE u.status = 'Planned'
+      AND u.user_id = $1;`, [userId]
     );
     res.json(result.rows);
   } catch(err) {
@@ -278,8 +327,8 @@ app.get("/planned-courses", async (req, res) => {
   }
 });
 
-app.get("/planned-courses/:semester", async (req, res) => {
-  
+app.get("/planned-courses/:semester", authenticateJWT, async (req, res) => {
+  const userId = req.user.id;
   const sem = req.params.semester;
   
   try {
@@ -296,7 +345,8 @@ app.get("/planned-courses/:semester", async (req, res) => {
       JOIN baskets b
         ON u.basket_id = b.id
       WHERE u.status = 'Planned' 
-      AND u.semester = $1;`, [sem]
+      AND u.semester = $1
+      AND u.user_id = $2;`, [sem, userId]
     );
     res.json(result.rows);
   } catch(err) {
@@ -304,7 +354,8 @@ app.get("/planned-courses/:semester", async (req, res) => {
   }
 });
 
-app.post("/planned-courses", async (req, res) => {
+app.post("/planned-courses", authenticateJWT, async (req, res) => {
+  const userId = req.user.id;
   try {
     const { courseId, semester, basket } = req.body;
     
@@ -323,9 +374,9 @@ app.post("/planned-courses", async (req, res) => {
   `INSERT INTO user_courses
     (user_id, course_id, semester, basket_id, status)
    VALUES
-    (1, $1, $2, $3, 'Planned')
+    ($4, $1, $2, $3, 'Planned')
    RETURNING *`,
-  [courseId, semester, basketId]
+  [courseId, semester, basketId, userId]
 );
     
     res.status(201).json(result.rows[0]);
@@ -335,7 +386,8 @@ app.post("/planned-courses", async (req, res) => {
   }
 });
 
-app.delete("/planned-courses", async (req, res) => {
+app.delete("/planned-courses", authenticateJWT, async (req, res) => {
+  const userId = req.user.id;
   try {
     const { courseId } = req.body;
 
@@ -343,8 +395,9 @@ app.delete("/planned-courses", async (req, res) => {
       `DELETE FROM user_courses
        WHERE course_id = $1
        AND status = 'Planned'
+       AND user_id = $2
        RETURNING *;`,
-      [courseId]
+      [courseId, userId]
     );
 
     if (result.rowCount === 0) {
