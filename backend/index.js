@@ -2,8 +2,13 @@ const cors = require("cors");
 const express = require('express');
 const app = express();
 
+require("dotenv").config();
+const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
+
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
 
 const port = 3000;
 const { Pool } = require('pg');
@@ -19,6 +24,54 @@ const pool = new Pool({
   port: 5432,
 });
 
+const JWT_secret = process.env.JWT_secret;
+
+app.post("/login", async (req, res) => {
+  const {email, password} = req.body;
+
+  try {
+    const normalisedEmail = email.trim().toLowerCase();
+
+    const result = await pool.query(`
+      SELECT * FROM users
+      WHERE email = $1;`, [normalisedEmail]);
+
+    if (!result.rows[0]) {
+      return res.status(401).json({
+        error: "Invalid email or password"
+      })
+    }
+    const hashedPassword = result.rows[0].password_hash;
+
+    const passwordMatch = await bcrypt.compare(password, hashedPassword);
+
+    if (!passwordMatch) {
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+    const payload = {
+      id: result.rows[0].id,
+      disciplineId: result.rows[0].discipline_id,
+    }
+
+    const token = jwt.sign(payload, JWT_secret, { expiresIn: '7d' });
+
+    res.status(200).json({message: "User logged in successfully"});
+
+  } catch(err) {
+    console.error(err);
+    res.status(500).json({error: "Internal server error"})
+  }
+})
+app.get("/users", async(req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT * FROM users;`);
+      res.json(result.rows);
+
+  } catch(err) {
+    console.error(err);
+  }
+})
 app.post("/register", async (req, res) =>{
   try {
     const { username, email, password, disciplineId } = req.body;

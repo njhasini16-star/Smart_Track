@@ -56,6 +56,8 @@ function Registration() {
                 disciplineId: discipline
             })
         })
+        const data = await res.json();
+
         if (!res.ok) {
             alert(data.error);
             return;
