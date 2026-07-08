@@ -18,6 +18,13 @@ function Dashboard({discipline}) {
   const GraduationRequirements = {"AI":173, "CL":173, "CE":171, "CSE":173,
      "EE":173, "ICDT":173, "MSE":173, "ME":173};
 
+  async function Logout() {
+    res = await fetch("http://localhost:3000/logout", {
+      method: 'POST',
+      credentials: "include"
+    })
+  }
+
   async function fetchCompletedCourses() {
   try {
   const data = await getAllCompletedCourses();
@@ -131,6 +138,7 @@ data.forEach(course => {
   return (<>
     <div className="pseudo w-auto"></div>
     <h1 className="w-auto bg-red-200 p-2 lg:ml-51">Smart Track Dashboard</h1>
+    <button onClick={Logout}>Log out</button>
     <div className="grid grid-cols-1 md:grid-cols-2 gap-2 m-2 lg:w-3/4 lg:ml-auto lg:mr-8">
     <DonutChart completed={TotalCompletedCredits} remaining={remainingCredits} pending={plannedCredits}/>  
     <AcademicProgress core={coreCredits} electives={electiveCredits} baskets={otherBasketCredits} cgpa={cgpa}/>

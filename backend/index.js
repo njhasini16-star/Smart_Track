@@ -26,6 +26,11 @@ const pool = new Pool({
 
 const JWT_secret = process.env.JWT_secret;
 
+app.get("/logout", (req, res) => {
+  res.clearCookie("token");
+  res.status(200).json({message: "Logged out successfully"});
+})
+
 const authenticateJWT = (req, res, next) => {
      const token = req.cookies.token;
 
