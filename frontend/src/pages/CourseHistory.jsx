@@ -1,10 +1,20 @@
-import { Outlet, NavLink } from "react-router-dom";
+import { Outlet, NavLink, useOutletContext, useNavigate, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 
-function CourseHistory({currentSem}) {
-  console.log(currentSem)
+function CourseHistory() {
+  const context = useOutletContext(); 
+  const {currentSem} = useOutletContext();
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  useEffect(() => {
+    if (location.pathname === "/course-history") {
+      navigate(`/course-history/${currentSem}`, { replace: true });
+    }
+  }, [currentSem, location.pathname, navigate]);
+
   return (
     <div className="lg:ml-55">
-      {/* <div className="pseudo"></div> */}
       <h1 className="mt-13">Course-History</h1>
       <div className="flex m-5 lg:flex-col">
       <nav className="timeline inline-flex flex-col lg:flex-row items-center w-fit absolute" style={{ "--progress": `${((currentSem - 1) / 7) * 100}%` }}>
@@ -18,7 +28,7 @@ function CourseHistory({currentSem}) {
 ))}
       </nav>
       <div className="inline-flex lg:block h-fit w-fit bg-gray-300 ">
-        <Outlet/>
+        <Outlet context={context} />
       </div>
       </div>
     </div>);

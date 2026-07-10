@@ -14,7 +14,8 @@ CREATE TABLE users (
     username TEXT UNIQUE NOT NULL,
     email TEXT UNIQUE NOT NULL,
     discipline_id INT REFERENCES disciplines(id),
-    password_hash TEXT NOT NULL
+    password_hash TEXT NOT NULL,
+    roll_number VARCHAR(10) UNIQUE NOT NULL
 );
 
 CREATE TABLE courses (

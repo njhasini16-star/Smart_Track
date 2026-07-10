@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
+import { useOutletContext } from "react-router-dom";
 import Search from "../components/search";
 import CourseTable from "../components/CourseTable";
 import { getPlannedCourses, addPlannedCourse, deletePlannedCourse } from "../api/PlannedCourses";
 
-function SemesterPlanning({currentSem}) {
+function SemesterPlanning() {
+  const { currentSem, disciplineCode} = useOutletContext();
 
   const [selectedSem, setSelectedSem] = useState(currentSem+1)
-
   const [plannedSemesters, setPlannedSemesters] = useState(() => {
     const semesters = {};
 
@@ -80,7 +81,7 @@ async function handleDeleteCourse(courseId) {
       <CourseTable courses= {plannedSemesters[selectedSem]} onDelete={handleDeleteCourse}/>
     </div>
     <div className="inline-block lg:block lg:my-3 lg:mx-0">
-      <Search onSelectCourse={handleAddCourse} discipline={'CSE'} mode="Planned"/>
+      <Search onSelectCourse={handleAddCourse} discipline={disciplineCode} mode="Planned"/>
     </div> 
     </div>
     </div>

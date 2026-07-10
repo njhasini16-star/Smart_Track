@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Registration() {
+    const navigate = useNavigate();
 
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
@@ -8,6 +10,7 @@ function Registration() {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [discipline, setDiscipline] = useState("");
+    const [rollnum, setRollnum] = useState();
 
     async function getDisciplines() {
         try {
@@ -26,6 +29,7 @@ function Registration() {
 
     async function handleSubmit(e) {
         e.preventDefault();
+        console.log("Submitting...");
 
         if (password !== confirmPassword) {
             alert("password do not match!");
@@ -53,7 +57,8 @@ function Registration() {
                 username: username.trim(),
                 email: email.trim().toLowerCase(),
                 password: password,
-                disciplineId: discipline
+                disciplineId: discipline,
+                rollnum
             })
         })
         const data = await res.json();
@@ -61,7 +66,8 @@ function Registration() {
         if (!res.ok) {
             alert(data.error);
             return;
-}
+        }
+        navigate("/login");
         } catch(err) {
             console.error(err);
         }
@@ -74,6 +80,9 @@ function Registration() {
 
             <input required type="email" value={email} placeholder="email"
             onChange={(e) => setEmail(e.target.value)}/>
+
+            <input minLength={8} maxLength={8} required type="text" placeholder="roll number" value={rollnum}
+            onChange={(e) => setRollnum(e.target.value)}/>
 
             <input minLength={8} required type="password" value={password} placeholder="password"
             onChange={(e) => setPassword(e.target.value)}/>

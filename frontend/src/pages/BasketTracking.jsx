@@ -1,18 +1,20 @@
 import { useState, useEffect } from "react";
+import { useOutletContext } from "react-router-dom";
 import { getAllCompletedCourses } from "../api/completedCourses";
 import { getCourses } from "../api/courses";
 
-function BasketTracking({discipline}) {
+function BasketTracking() {
+  const { disciplineCode } = useOutletContext();
 
   const [selectedBasket, setSelectedBasket] = useState("Discipline Electives");
   const [courses, setCourses] = useState({});
   const [completedCourses, setCompletedCourses] = useState({});
 
-async function  fetchCourses(discipline) {
+async function  fetchCourses() {
   try {
   let data = await getCourses();
 
-  data = data.filter(course => !course.discipline || course.discipline === discipline)
+  data = data.filter(course => !course.discipline || course.discipline === disciplineCode)
   const grouped = {};
 
   data.forEach(course => {
@@ -46,10 +48,12 @@ setCompletedCourses(grouped);
 }
 
 useEffect(() => 
-  {fetchBasketWiseCourses();
-    fetchCourses(discipline);
+  {
+    if (!disciplineCode) return;
+    fetchBasketWiseCourses();
+    fetchCourses();
   },
-[discipline])
+[disciplineCode])
 
 const baskets = ["Institute level Courses", "Discipline Core Courses", "Discipline Electives",
   "Open Electives", "Science Basket", "Math Basket", "Materials Basket", "HSS Basket"
@@ -59,42 +63,42 @@ const basketTotalCredits = {"Institute level Courses":31,
   "Open Electives":20, "Science Basket":8, "Math Basket":10, 
   "Materials Basket":3, "HSS Basket":20};
 
-  if (discipline === "AI") {
+  if (disciplineCode === "AI") {
     basketTotalCredits["Discipline Core Courses"] = 44;
     basketTotalCredits["Discipline Electives"] = 24;
   }
 
-  if (discipline === "CL") {
+  if (disciplineCode === "CL") {
     basketTotalCredits["Discipline Core Courses"] = 42;
     basketTotalCredits["Discipline Electives"] = 24;
   }
 
-  if (discipline === "CE") {
+  if (disciplineCode === "CE") {
     basketTotalCredits["Discipline Core Courses"] = 42;
     basketTotalCredits["Discipline Electives"] = 24;
   }
 
-  if (discipline === "CSE") {
+  if (disciplineCode === "CSE") {
     basketTotalCredits["Discipline Core Courses"] = 36;
     basketTotalCredits["Discipline Electives"] = 30;
   }
 
-  if (discipline === "EE") {
+  if (disciplineCode === "EE") {
     basketTotalCredits["Discipline Core Courses"] = 43;
     basketTotalCredits["Discipline Electives"] = 24;
   }
   
-  if (discipline === "ICDT") {
+  if (disciplineCode === "ICDT") {
     basketTotalCredits["Discipline Core Courses"] = 44;
     basketTotalCredits["Discipline Electives"] = 24;
   }
 
-  if (discipline === "MSE") {
+  if (disciplineCode === "MSE") {
     basketTotalCredits["Discipline Core Courses"] = 42;
     basketTotalCredits["Discipline Electives"] = 24;
   }
 
-  if (discipline === "ME") {
+  if (disciplineCode === "ME") {
     basketTotalCredits["Discipline Core Courses"] = 44;
     basketTotalCredits["Discipline Electives"] = 24;
   }

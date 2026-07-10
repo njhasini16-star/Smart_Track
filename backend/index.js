@@ -13,7 +13,10 @@ app.use(cookieParser());
 const port = 3000;
 const { Pool } = require('pg');
 
-app.use(cors());
+app.use(cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+}));
 app.use(express.json());
 
 const pool = new Pool({
@@ -26,7 +29,7 @@ const pool = new Pool({
 
 const JWT_secret = process.env.JWT_secret;
 
-app.get("/logout", (req, res) => {
+app.post("/logout", (req, res) => {
   res.clearCookie("token");
   res.status(200).json({message: "Logged out successfully"});
 })
@@ -50,17 +53,20 @@ const authenticateJWT = (req, res, next) => {
 
 
 app.post("/login", async (req, res) => {
+  console.log("Login endpoint hit");
   const { email, password } = req.body;
+  console.log(req.body);
 
   try {
-    const normalisedEmail = email.trim().toLowerCase();
+    const normalizedEmail = email.trim().toLowerCase();
 
     const result = await pool.query(
       `SELECT id, discipline_id, password_hash
        FROM users
        WHERE email = $1;`,
-      [normalisedEmail]
+      [normalizedEmail]
     );
+    console.log(result.rows);
 
     if (!result.rows[0]) {
       return res.status(401).json({
@@ -86,10 +92,12 @@ app.post("/login", async (req, res) => {
     if (!JWT_secret) {
       throw new Error("JWT_SECRET is not defined");
     }
+    console.log("JWT secret:", JWT_secret);
 
     const token = jwt.sign(payload, JWT_secret, {
       expiresIn: "7d",
     });
+    console.log("Token created");
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -97,13 +105,15 @@ app.post("/login", async (req, res) => {
       sameSite: "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-
+    console.log("Cookie set");
     res.status(200).json({
       message: "User logged in successfully",
     });
 
   } catch (err) {
+    console.error("LOGIN ERROR:");
     console.error(err);
+    console.error(err.stack);
     res.status(500).json({
       error: "Internal server error",
     });
@@ -120,15 +130,36 @@ app.get("/users", async(req, res) => {
     console.error(err);
   }
 })
+
+app.get("/me", authenticateJWT, async (req, res) => {
+  try {
+    const result = await pool.query(
+        "SELECT id, username, email, discipline_id, roll_number FROM users WHERE id = $1",
+        [req.user.id]
+    );
+
+    if (!result.rows[0]) {
+      return res.status(404).json({
+        error: "User not found"
+        });
+    }
+    res.status(200).json(result.rows[0]);
+  } catch(err) {
+    console.error(err);
+    res.status(500).json({error: "Internal server error"})
+  }
+});
+
 app.post("/register", async (req, res) =>{
   try {
-    const { username, email, password, disciplineId } = req.body;
+    const { username, email, password, disciplineId, rollnum } = req.body;
     const hashed_password = await bcrypt.hash(password, saltRounds);
 
-    const normalisedEmail = email.trim().toLowerCase();
+    const normalizedEmail = email.trim().toLowerCase();
     const normalizedUsername = username.trim();
-    
-    if (!normalisedEmail.endsWith("@iitgn.ac.in")) {
+    const normalizedRollnum = rollnum.trim();
+
+    if (!normalizedEmail.endsWith("@iitgn.ac.in")) {
     return res.status(400).json({
         error: "Only IITGN email addresses are allowed."
     });
@@ -150,11 +181,24 @@ app.post("/register", async (req, res) =>{
         error: "discipline required"
       });
     }
-
+    if (!/^\d{8}$/.test(normalizedRollnum)) {
+    return res.status(400).json({
+        error: "Invalid roll number"
+    });
+}
+    const joiningYear = 2000 + Number(normalizedRollnum.slice(0, 2));
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    
+    if (joiningYear < 2008 || currentYear < joiningYear) {
+      return res.status(400).json({
+        error: "Invalid roll number"
+    });
+    }
     const result = await pool.query(`
-      INSERT INTO users (username, email, discipline_id, password_hash)
-      VALUES ($1, $2, $3, $4)
-      RETURNING id, username, email, discipline_id;`, [normalizedUsername, normalisedEmail, disciplineId, hashed_password])
+      INSERT INTO users (username, email, discipline_id, password_hash, roll_number)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING id, username, email, discipline_id, roll_number;`, [normalizedUsername, normalizedEmail, disciplineId, hashed_password, normalizedRollnum])
 
       res.status(201).json(result.rows[0]);
 
@@ -168,6 +212,11 @@ app.post("/register", async (req, res) =>{
       if (err.constraint === "users_username_key") {
         return res.status(409).json({
           error: "username already exists"
+        });
+      }
+      if (err.constraint === "users_roll_number_key") {
+        return res.status(409).json({
+          error: "Roll number already exists"
         });
       }
     }

@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
+import { useOutletContext, useNavigate } from "react-router-dom";
 import DonutChart from "../components/DonutChart";
 import SemSummary from "../components/SemSumTable";
 import AcademicProgress from "../components/AcademicProgress";
 import { getAllCompletedCourses } from "../api/completedCourses";
 import { getAllPlannedCourses } from "../api/PlannedCourses";
 
-function Dashboard({discipline}) {
-
+function Dashboard() {
+  const context = useOutletContext();
+  const discipline = context.disciplineCode;
+  const navigate = useNavigate();
+  
   const [completedCourses, setCompletedCourses] = useState({});
   const [plannedCredits, setPlannedCredits] = useState(0);
   const [basketOverview, setBasketOverview] = useState({});
@@ -19,10 +23,14 @@ function Dashboard({discipline}) {
      "EE":173, "ICDT":173, "MSE":173, "ME":173};
 
   async function Logout() {
-    res = await fetch("http://localhost:3000/logout", {
+    console.log("logout clicked");
+    const res = await fetch("http://localhost:3000/logout", {
       method: 'POST',
       credentials: "include"
     })
+    if (res.ok) {
+    navigate("/login");
+    }
   }
 
   async function fetchCompletedCourses() {
@@ -138,7 +146,7 @@ data.forEach(course => {
   return (<>
     <div className="pseudo w-auto"></div>
     <h1 className="w-auto bg-red-200 p-2 lg:ml-51">Smart Track Dashboard</h1>
-    <button onClick={Logout}>Log out</button>
+    <button onClick={Logout} className="bg-red-500 text-white p-2 z-50 relative">Log out</button>
     <div className="grid grid-cols-1 md:grid-cols-2 gap-2 m-2 lg:w-3/4 lg:ml-auto lg:mr-8">
     <DonutChart completed={TotalCompletedCredits} remaining={remainingCredits} pending={plannedCredits}/>  
     <AcademicProgress core={coreCredits} electives={electiveCredits} baskets={otherBasketCredits} cgpa={cgpa}/>
