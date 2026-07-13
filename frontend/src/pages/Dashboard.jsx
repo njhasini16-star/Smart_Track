@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useOutletContext, useNavigate } from "react-router-dom";
+
 import DonutChart from "../components/DonutChart";
 import SemSummary from "../components/SemSumTable";
 import AcademicProgress from "../components/AcademicProgress";
@@ -9,6 +10,8 @@ import { getAllPlannedCourses } from "../api/PlannedCourses";
 function Dashboard() {
   const context = useOutletContext();
   const discipline = context.disciplineCode;
+  const user = context.user;
+
   const navigate = useNavigate();
   
   const [completedCourses, setCompletedCourses] = useState({});
@@ -144,13 +147,24 @@ data.forEach(course => {
   remaining: 30
 });
   return (<>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
     <div className="pseudo w-auto"></div>
-    <h1 className="w-auto bg-red-200 p-2 lg:ml-51">Smart Track Dashboard</h1>
-    <button onClick={Logout} className="bg-red-500 text-white p-2 z-50 relative">Log out</button>
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 m-2 lg:w-3/4 lg:ml-auto lg:mr-8">
+    <div className="m-2 flex flex-col lg:ml-60">
+    <div className="flex content-end">
+    <h1 className="py-2 text-3xl font-bold">Smart Track Dashboard</h1>
+    <h1 className="text-xl ml-auto py-2 mt-auto">Welcome, {user.username}</h1>
+    </div>
+    <div className="flex">
+    <h1 className="text-xl py-2" >Track your progress</h1>
+    <button onClick={Logout} className="ml-auto block bg-slate-600 border text-white px-2 rounded-lg">Log out</button>
+    </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 lg:w-full lg:gap-4">
+    
     <DonutChart completed={TotalCompletedCredits} remaining={remainingCredits} pending={plannedCredits}/>  
     <AcademicProgress core={coreCredits} electives={electiveCredits} baskets={otherBasketCredits} cgpa={cgpa}/>
     <SemSummary args={semInfo}/>
+    </div>
+    </div>
     </div>
     </>
     );
