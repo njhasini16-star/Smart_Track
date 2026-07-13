@@ -115,24 +115,30 @@ function Card({basket, onClick, selectedBasket}) {
 
   let colour;
   if (percentage < 30) {
-    colour = "red";
+    colour = "bg-red-400";
   } else if (percentage < 70) {
-    colour = "orange";
+    colour = "bg-amber-400";
   } else if (percentage < 99) {
-    colour = "blue";
+    colour = "bg-blue-400";
   } else {
-    colour = "green";
+    colour = "bg-emerald-400";
   }
   
-  return( <div onClick={onClick} className={`bg-indigo-100 w-full p-6 rounded-lg hover:shadow-lg ${selectedBasket === basket ? "ring-3 ring-indigo-400 shadow-xl" : ""}`}>
-    <p className="text-center mb-3 text-xl font-semibold">{basket}</p>
-    <div className="text-lg mb-1">{rounded}% Completed</div>
-
-    <div className={`inline-flex h-4 flex-shrink-0 ${percentage >= 100 ? "rounded-full" : "rounded-l-full"}`} 
-    style={{width:`${((completedCredits/basketTotalCredits[basket])*45)*4}px`, backgroundColor:`${colour}`}}></div>
-
-    <div className={`inline-flex bg-slate-300 h-4 flex-shrink-0 mr-2 ${percentage === 0 ? "rounded-full" : "rounded-r-full"}`} style={{width:`${(45-(completedCredits/basketTotalCredits[basket])*45)*4}px`}}></div>
+  return( <div onClick={onClick} className={`bg-white border border-slate-600 border-2 w-full rounded-xl overflow-hidden hover:shadow-lg flex flex-col items-center hover:-translate-y-[2px] ${selectedBasket === basket ? "ring-3 ring-indigo-300 shadow-xl" : ""} transition-all duration-150 cursor-pointer`}>
+    <p className="text-center mb-3 text-lg bg-slate-600 w-full text-white py-1">{basket}</p>
+    <div className="rounded-t-xl w-full h-full flex flex-col items-center p-5 pt-3s">
+    <div className="w-full max-w-50 mt-auto mb-3 h-4 bg-slate-300 rounded-full overflow-hidden">
+  <div
+    className={`h-full ${percentage >= 100 ? "rounded-full" : "rounded-l-full"} ${colour}`}
+    style={{
+      width: `${percentage}%`,
+      
+    }}
+  />
+</div>
+    
     <div >{completedCredits}/{basketTotalCredits[basket]} Credits</div>
+    </div>
   </div>
   );
 }
@@ -161,43 +167,61 @@ function BasketDetails({basket}) {
     </div>
     <div className="grid grid-cols-1 md:grid-cols-2 mt-2 gap-3 ">
     <div className="w-full">
-    <p className="mb-2">Completed Courses</p>
-    <table className="bg-emerald-50 rounded-lg w-full overflow-hidden table-auto">
+    
+    <table className="bg-white rounded-lg w-full overflow-hidden table-fixed">
+  <colgroup>
+    <col className="w-18" />
+    <col />
+    <col className="w-17" />
+    <col className="w-16" />
+  </colgroup>
       <thead >
-      <tr className="bg-emerald-200">
-        <th className="w-23">Code</th>
-        <th>Name</th>
-        <th className="w-20">Credits</th>
-        <th className="w-18">Grade</th>
+        <tr>
+          <th colspan={4} className="bg-slate-600 text-white">Completed Courses</th>
+        </tr>
+      <tr className="bg-slate-600 text-white">
+        <th >Code</th>
+        <th>Course</th>
+        <th >Credits</th>
+        <th >Grade</th>
       </tr>
       </thead>
       <tbody>
         {completedCourses[basket]?.length > 0 ? 
   completedCourses[basket].map((course, idx) => <tr key = {idx}>
-    <td className="whitespace-nowrap !px-4 !py-3 text-center">{course.course_code}</td>
-    <td className="!px-4 !py-3">{course.name}</td>
-    <td className="!px-4 !py-3 text-center">{course.credits}</td>
-    <td className="!px-4 !py-3 text-center">{course.grade}</td>
+    <td className="text-center">{course.course_code}</td>
+    <td className="!px-3 !py-4">{course.name}</td>
+    <td className="text-center">{course.credits}</td>
+    <td className=" text-center">{course.grade}</td>
   </tr> ) : <tr><td className="text-center" colSpan={4}>No courses completed yet</td></tr>}
     </tbody>
     </table>
     </div>
     <div className="w-full">
-    <p className="mb-2">Remaining Courses</p>
-    <table className="bg-amber-50 rounded-lg overflow-hidden table-fixed w-full">
+    
+    <table className="bg-white rounded-lg overflow-hidden table-fixed w-full">
+      <colgroup>
+    <col className="w-18" />
+    <col />
+    <col className="w-18" />
+    
+  </colgroup>
       <thead>
-      <tr className="bg-amber-200 rounded-t-lg">
-        <th className="rounded-tl-lg w-23">Code</th>
+        <tr>
+          <th colspan={3} className="bg-slate-600 text-white">Remaining Courses</th>
+        </tr>
+      <tr className="bg-slate-600 text-white">
+        <th className="w-23">Code</th>
         <th>Name</th>
-        <th className="rounded-tr-lg w-20">Credits</th>
+        <th className="w-20">Credits</th>
       </tr>
       </thead>
       <tbody>
         {remaining.length > 0 ? 
   remaining.map((course, idx) => <tr key = {idx}>
-    <td className="whitespace-nowrap !px-4 !py-3 text-center">{course.course_code}</td>
-    <td className="!px-4 !py-3 ">{course.name}</td>
-    <td className="!px-4 !py-3 text-center">{course.credits}</td>
+    <td className="text-center w-20">{course.course_code}</td>
+    <td className="!px-3 !py-3 ">{course.name}</td>
+    <td className=" text-center">{course.credits}</td>
   </tr> ) : <tr><td className="text-center" colSpan={3}>No courses remaining</td></tr>}
     </tbody>
     </table>
@@ -207,7 +231,8 @@ function BasketDetails({basket}) {
   );
 }
 
-  return (<div className="lg:ml-55 xl:ml-60">
+  return (<div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+  <div className="lg:ml-55 xl:ml-60">
     <div className="mx-3 lg:ml-0 xl:ml-0 xl:mr-7">
     <div className="pseudo"></div>
     <h1 className="text-3xl font-bold my-3">Basket-Tracking</h1>
@@ -219,6 +244,7 @@ function BasketDetails({basket}) {
       </div>
       <BasketDetails basket={selectedBasket}/>
       </div>
+    </div>
     </div>);
 }
 export default BasketTracking;
