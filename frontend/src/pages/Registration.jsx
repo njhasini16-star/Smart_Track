@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 function Registration() {
     const navigate = useNavigate();
@@ -73,32 +73,69 @@ function Registration() {
         }
     }
 
-    return(
+    return(<div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50
+to-indigo-100 flex justify-center items-center">
+    <div className="bg-white rounded-2xl p-10 shadow-2xl">
+        <h1 className="text-2xl font-bold">Smart Track</h1>
+      <h3 className="mb-3 text-gray-400">Academic Planning Made Simple</h3>
+      <h3 className="my-3">Create your account</h3>
         <form onSubmit={handleSubmit}>
-            <input required type="text" value={username} placeholder="username"
+            <input className="block w-full border border-gray-400 focus:border-blue-400 focus:ring-2 
+            focus:ring-blue-200 my-2 transition rounded-lg py-2 px-3" 
+            
+            required type="text" value={username} placeholder="Username"
             onChange={(e) => setUsername(e.target.value)}/>
 
-            <input required type="email" value={email} placeholder="email"
+            <input className="block w-full border border-gray-400 focus:border-blue-400 focus:ring-2 
+            focus:ring-blue-200 my-2 transition rounded-lg py-2 px-3" 
+            
+            required type="email" value={email} placeholder="Email"
             onChange={(e) => setEmail(e.target.value)}/>
 
-            <input minLength={8} maxLength={8} required type="text" placeholder="roll number" value={rollnum}
+            <input className="block w-full border border-gray-400 focus:border-blue-400 focus:ring-2 
+            focus:ring-blue-200 my-2 transition rounded-lg py-2 px-3" 
+            
+            minLength={8} maxLength={8} required type="text" placeholder="Roll number" value={rollnum}
             onChange={(e) => setRollnum(e.target.value)}/>
 
-            <input minLength={8} required type="password" value={password} placeholder="password"
+            <input className="block w-full border border-gray-400 focus:border-blue-400 focus:ring-2 
+            focus:ring-blue-200 my-2 transition rounded-lg py-2 px-3" 
+            
+            minLength={8} required type="password" value={password} placeholder="Password"
             onChange={(e) => setPassword(e.target.value)}/>
 
-            <input minLength={8} required type="password" value={confirmPassword} placeholder="confirm password"
+            <input className="block w-full border border-gray-400 focus:border-blue-400 focus:ring-2 
+            focus:ring-blue-200 my-2 transition rounded-lg py-2 px-3" 
+            
+            minLength={8} required type="password" value={confirmPassword} placeholder="Confirm password"
             onChange={(e) => setConfirmPassword(e.target.value)}/>
+            
+            <select className="block border border-gray-400 focus:border-blue-400 focus:ring-2 
+            focus:ring-blue-200 my-2 transition rounded-lg py-2 px-2"
+            
+            required value={discipline} onChange={(e) => setDiscipline(e.target.value)}>
 
-            <select required value={discipline} onChange={(e) => setDiscipline(e.target.value)}>
-                <option value="">Select your discipline</option>
+                <option value="" className="text-gray-600">Select your discipline</option>
                 {disciplines.map(d => 
                     <option key={d.id} value={d.id}>{d.name}</option>
                 )}
             </select>
 
-            <button type="submit">register</button>
+            <button className="block mt-3 text-center w-full bg-blue-600 hover:bg-blue-700 rounded-lg py-2 px-3 text-white" 
+            type="submit">Register</button>
+
+            <p className="mt-3 text-center text-sm text-gray-600">
+                Already have an account?{" "}
+                <Link
+                to="/login"
+                className="font-medium text-blue-500 hover:text-blue-600 hover:underline">
+                  Log in
+                </Link>
+            </p>
+
         </form>
+        </div>
+        </div>
     )
 }
 
