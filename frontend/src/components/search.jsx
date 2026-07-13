@@ -128,10 +128,14 @@ setBasketWiseCredits(calculateBasketCredits(completed, planned, filters));
   const matchesSearch =
     course.name.replace(/\s/g, "").toLowerCase().includes(query) ||
     course.course_code?.replace(/\s/g, "").toLowerCase().includes(query);
+
+  const freshSearch = (!plannedCourseIds?.includes(course.id)
+  && !completedCourseIds?.includes(course.id));
+
    if (activeFilter === 'All / Open Electives'){
-    return matchesSearch
+    return matchesSearch && freshSearch;
    }
-  return matchesBasket && matchesSearch && matchesDiscipline;
+  return matchesBasket && matchesSearch && matchesDiscipline && freshSearch;
 });
 
   const searchResults =
