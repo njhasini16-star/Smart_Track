@@ -1,76 +1,79 @@
-function Sector({ startAngle, endAngle, radius = 100, cx = 100, cy = 100, color = "tomato", name }) {
-  // Convert degrees → radians
-  const startRad = (Math.PI / 180) * startAngle;
-  const endRad = (Math.PI / 180) * endAngle;
+import { PieChart, Pie, Tooltip, ResponsiveContainer, Sector } from 'recharts';
 
-  // Compute start and end points
-  const x1 = cx + radius * Math.cos(startRad);
-  const y1 = cy + radius * Math.sin(startRad);
-  const x2 = cx + radius * Math.cos(endRad);
-  const y2 = cy + radius * Math.sin(endRad);
+function Donut({completed, pending, remaining}) {
 
-  const x4 = cx + (radius+10)* Math.cos((startRad + endRad)/2);
-  const y4 = cy + (radius+10)* Math.sin((startRad + endRad)/2);
-let textanch;
-  if (x4 > 100) {
-    textanch = "start";
-  } else {
-    textanch = "end"
-  }
+    const data = [
+        { name: 'Completed', credits: completed, color: "#10B981" },
+        { name: 'Pending', credits: pending, color: "#F59E0B" },
+        { name: 'Remaining', credits: remaining, color: "#CBD5E1" }
+    ];
+    
+    const CustomSector = (props) => {
+    return (
+        <Sector
+            {...props}
+            fill={props.payload.color}
+        />
+      );
+    };
 
-  // Large arc flag (needed if angle > 180°)
-  const largeArc = (endRad - startRad) > Math.PI ? 1 : 0;
-
-  // Path string
-  const d = `
-    M ${cx},${cy}
-    L ${x1},${y1}
-    A ${radius},${radius} 0 ${largeArc},1 ${x2},${y2}
-    Z
-  `;
-  
-  let num = ((endAngle-startAngle)*5)/18;
-  let rounded = num.toFixed(2);
-
-  return (<>
-  <path d={d} fill={color} />
-    <text x={x4} y={y4} textAnchor={textanch}
-    dominantBaseline="middle" fill="black">{name}:{rounded}%</text>
-    </>
-  );
+    return (
+      <ResponsiveContainer width="100%" height={300} >
+        <PieChart >
+            <Pie
+              data={data}
+              dataKey="credits"
+              nameKey="name"
+              innerRadius={65}
+              outerRadius={110}
+              paddingAngle={1}
+              cornerRadius={4}
+              shape={CustomSector}
+            />
+            <Tooltip />
+        </PieChart>
+      </ResponsiveContainer>
+    );
 }
+
+
 function DonutChart({completed, pending, remaining}) {
-    const total = completed + pending + remaining;
-    const angle1 = (remaining/total)*360;
-    const angle2 = angle1 + (completed/total)*360;
-
-return(<div className="mt-8 shadow-2xl rounded-2xl">
-      <h1 className="bg-red-200 p-2 text-center rounded-t-2xl">Credit Overview</h1>
-    <div className="bg-yellow-100 p-0 leading-none h-60 flex items-center">
-    <svg xmlns="http://www.w3.org/2000/svg" width="460" height="460" viewBox="-170 -170 500 500">
-      {/* Background circle */}
-      <circle className="shadow" cx="100" cy="100" r="100" fill="lightblue"/>
-      {/* Custom sectors */}
-      <Sector startAngle={0} endAngle={angle1} color="tomato" name="Remaining" />
-      <Sector startAngle={angle1} endAngle={angle2} color="green" name="Completed"/>
-      <Sector startAngle={angle2} endAngle={360} color="lightblue" name="Pending"/>
-
-      <circle cx="100" cy="100" r="70" fill="white" />
-    </svg>
+console.log({ completed, pending, remaining });
+return(<div className="mt-8 shadow-2xl rounded-2xl border-1 border-slate-600">
+      <h1 className="bg-red-300 p-2 text-center text-white rounded-t-2xl">Credit Overview</h1>
+    <div className='relative'>
+    <div className="bg-white p-0 leading-none h-60 flex items-center">
+    <Donut completed={completed} pending={pending} remaining={remaining}/>
     </div>
-    <div className="border-t border-gray-200 border-b border-gray-100 p-2">
-      <div className="bg-green-700 w-4 h-4 mr-2 inline-block"></div>
-      Completed Credits: {completed}
+    <div className='absolute inset-0 top-21 flex flex-col items-center'>
+    <div className='text-4xl font-bold'>{completed + pending + remaining}</div>
+    <div className='font-sm'>Total Credits</div>
     </div>
-    <div className="border-y border-gray-100 p-2">
-      <div className="bg-blue-300 w-4 h-4 mr-2 inline-block"></div>
-      Pending Credits: {pending}
-    </div>
-    <div className="border-y border-gray-100 p-2">
-      <div className="bg-red-400 w-4 h-4 mr-2 inline-block"></div>
-      Remaining Credits: {remaining}
     </div>
     
+    <div className="bg-white border-t border-gray-200 p-3 flex items-center">
+  <div className="w-4 h-4 rounded-full bg-[#10B981] mr-3"></div>
+
+  <span>Completed Credits</span>
+
+  <span className="ml-auto font-medium font-semibold text-slate-600">{completed}</span>
+</div>
+
+<div className="bg-white border-y border-gray-200 p-3 flex items-center">
+  <div className="w-4 h-4 rounded-full bg-[#F59E0B] mr-3"></div>
+
+  <span>Pending Credits</span>
+
+  <span className="ml-auto font-medium font-semibold text-slate-600">{pending}</span>
+</div>
+
+<div className="bg-white rounded-b-2xl border-b border-gray-200 p-3 flex items-center">
+  <div className="w-4 h-4 rounded-full bg-[#CBD5E1] mr-3"></div>
+
+  <span>Remaining Credits</span>
+
+  <span className="ml-auto font-medium font-semibold text-slate-600">{remaining}</span>
+</div>
     </div>);
 }
 export default DonutChart;
