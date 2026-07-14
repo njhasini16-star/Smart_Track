@@ -154,7 +154,7 @@ setBasketWiseCredits(calculateBasketCredits(completed, planned, filters));
       {filters.map((filter) => ( 
         <button className={`block flex flex-row items-center text-left px-3 py-1 hover:bg-slate-400 hover:text-white hover:cursor-pointer ${activeFilter===filter && "bg-blue-500 text-white"}`} key={filter}
         onClick={() => setActiveFilter(filter)}> <div className="lg:mr-4 mr-2">{filter === activeFilter && <span className="text-xs">&#x25BA;</span>}{" "}{filter}</div>
-        <div className={`${filter===activeFilter ? "text-white" : "text-slate-600"} text-sm font-semibold lg:inline-block lg:mr-3 ml-auto`}>{basketWiseCredits[filter]}/{basketTotalCredits[filter]}</div>
+       {mode === "Planned" && <div className={`${filter===activeFilter ? "text-white" : "text-slate-600"} text-sm font-semibold lg:inline-block lg:mr-3 ml-auto`}>{basketWiseCredits[filter]}/{basketTotalCredits[filter]}</div>}
         </button>
       ))}
       </div>
@@ -170,8 +170,8 @@ setBasketWiseCredits(calculateBasketCredits(completed, planned, filters));
           <div className="flex font-medium">{course.course_code || 'TBD'}
 
           {showGrade && (<>
-          <span>Grade:</span>
           <select
+          className="mx-4"
             value={grades[course.id] || "P"}
             onChange={(e) =>
     setGrades(prev => ({

@@ -9,16 +9,16 @@ function CourseTable({courses, onDelete}) {
       shortform: "Electives", tailwind: "bg-cyan-100 text-cyan-700"
   },
     "Math Basket":{
-      shortforms:"Math", tailwind:"bg-indigo-100 text-indigo-700"
+      shortform:"Math", tailwind:"bg-indigo-100 text-indigo-700"
   }, 
     "Materials Basket":{
       shortform:"Materials", tailwind: "bg-orange-100 text-orange-700"
   }, 
     "HSS Basket":{
-      shortform:"HSS", talwind: "bg-purple-100 text-purple-700"
+      shortform:"HSS", tailwind: "bg-purple-100 text-purple-700"
   }, 
     "Science Basket": {
-      shortform: "Science", tailwnd: "bg-green-100 text-green-700"
+      shortform: "Science", tailwind: "bg-green-100 text-green-700"
   }, 
     "Institute level Courses":{
       shortform: "Institute", tailwind: "bg-slate-100 text-slate-700"
@@ -42,8 +42,8 @@ function CourseTable({courses, onDelete}) {
         <td className="text-center">{course.credits || 'TBD'}</td>
         <td className="p-1"><span className={`${basketProperties[course.basket].tailwind} p-2 rounded-full`}>{basketProperties[course.basket].shortform}</span></td>
         <td className="text-center">{course.grade || '-'}</td>
-        <td><button onClick={() => onDelete(course.id)} className="text-red-600 hover:cursor-pointer">Delete</button></td>
-        </tr>)):<tr> <td className="text-gray-500 bg-white" colSpan={6}>No courses yet <br/>Search and add courses below</td></tr>}
+        <td><button onClick={() => onDelete(course)} className="text-red-600 hover:cursor-pointer">Delete</button></td>
+        </tr>)):<tr> <td className="text-gray-500 bg-white" colSpan={6}>No courses yet <br/>Search and add courses above</td></tr>}
       </tbody>
       </table>
 

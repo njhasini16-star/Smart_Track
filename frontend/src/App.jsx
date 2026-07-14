@@ -17,33 +17,39 @@ export default function App() {
     return( <>
     <nav className="bg-[rgba(0,0,0,0.784)] m-0 flex fixed  top-0 flex-col md:flex-row lg:flex-col text-white h-full md:justify-center md:h-auto md:w-full lg:w-fit lg:h-full navbar">
       <NavLink
-        className="links shadow flex-shrink-0" 
-        style={({isActive}) => ({backgroundColor: isActive ? "whitesmoke" : "",
-          color: isActive ? "black" : "",})}
+        className={({ isActive }) =>
+    `links shadow flex-shrink-0 ${
+      isActive ? "bg-blue-500" : ""
+    }`}
         to="/">
         DASHBOARD 
       </NavLink>
 
       <NavLink 
-        className="links shadow flex-shrink-0" 
-        style={({isActive}) => ({backgroundColor: isActive ? "whitesmoke" : "",
-          color: isActive ? "black" : "",})}
+        className={({ isActive }) =>
+    `links shadow flex-shrink-0 ${
+      isActive ? "bg-blue-500" : ""
+    }`}
+
         to="/basket-tracking">
         BASKET TRACKING
       </NavLink>
 
       <NavLink 
-        className="links shadow flex-shrink-0" 
-        style={({isActive}) => ({backgroundColor: isActive ? "whitesmoke" : "",
-          color: isActive ? "black" : "",})}
+        className={({ isActive }) =>
+    `links shadow flex-shrink-0 ${
+      isActive ? "bg-blue-500" : ""
+    }`}
+        
         to="/semester-planning">
         SEMESTER PLANNING
       </NavLink>
 
       <NavLink 
-        className="links shadow flex-shrink-0" 
-        style={({isActive}) => ({backgroundColor: isActive ? "whitesmoke" : "",
-          color: isActive ? "black" : "",})}
+        className={({ isActive }) =>
+    `links shadow flex-shrink-0 ${
+      isActive ? "bg-blue-500" : ""
+    }`}
         to="/course-history">
         COURSE HISTORY
       </NavLink>

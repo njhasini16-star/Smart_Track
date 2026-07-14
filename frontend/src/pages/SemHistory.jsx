@@ -41,19 +41,22 @@ useEffect(() => {
       console.error(err);
     }}
 
-  async function handleDeleteCourse(courseId) {
+  async function handleDeleteCourse(course) {
   try {
-      await deleteCompletedCourse(courseId);
+      await deleteCompletedCourse(course.id);
       await fetchCompletedCourses();
     } catch(err) {
       console.error(err);
     }}
 
-    return (<div className="mx-8">
-        <h1 className="mb-8">This is {semId}</h1>
-        
-        <CourseTable courses= {completedCourses[semId] || []} onDelete={handleDeleteCourse}/>
+    return (<div className="ml-4 lg:mx-0 lg:my-8 bg-white rounded-2xl border border-slate-600 overflow-hidden">
+      <div className="bg-slate-600 text-white py-1 text-center">Completed Courses - Semester {semId}</div>
+        <div className="my-3">
         <Search onSelectCourse={handleAddCourse} discipline={disciplineCode} mode="Completed"/>
+        </div>
+        <div className="m-3">
+        <CourseTable courses= {completedCourses[semId] || []} onDelete={handleDeleteCourse}/>
+        </div>
         </div>
     );
 }

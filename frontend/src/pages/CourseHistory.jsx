@@ -13,24 +13,41 @@ function CourseHistory() {
     }
   }, [currentSem, location.pathname, navigate]);
 
-  return (
+  return (<div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+    <div className="pseudo"></div>
     <div className="lg:ml-55">
-      <h1 className="mt-13">Course-History</h1>
+      <h1 className="text-3xl font-bold p-2">Course-History</h1>
       <div className="flex m-5 lg:flex-col">
       <nav className="timeline inline-flex flex-col lg:flex-row items-center w-fit absolute" style={{ "--progress": `${((currentSem - 1) / 7) * 100}%` }}>
-        {Array.from({ length: 8 }, (_, i) => (
-  <NavLink
-    key={i + 1}
-    className={`sem-link ${currentSem == i+1 ? "sem-link-current" : currentSem < i+1 ? "sem-link-future" : "" }`}
-    to={`/course-history/${i + 1}`}>
-    Sem{i + 1}
-  </NavLink>
-))}
+        {Array.from({ length: 8 }, (_, i) => {
+  const semester = i + 1;
+  const isFuture = semester > currentSem;
+
+  return isFuture ? (
+    <div
+      key={semester}
+      className="sem-link sem-link-future"
+    >
+      Sem{semester}
+    </div>
+  ) : (
+    <NavLink
+      key={semester}
+      to={`/course-history/${semester}`}
+      className={`sem-link ${
+        semester === currentSem ? "sem-link-current" : ""
+      }`}
+    >
+      Sem{semester}
+    </NavLink>
+  );
+})}
       </nav>
-      <div className="inline-flex lg:block h-fit w-fit bg-gray-300 ">
+      <div className="inline-flex lg:block h-fit w-fit ">
         <Outlet context={context} />
       </div>
       </div>
+    </div>
     </div>);
 }
 export default CourseHistory;
