@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import useToast from "../hooks/useToast";
+import Toast from "../components/Toast";
 
 function Registration() {
     const navigate = useNavigate();
@@ -10,7 +12,8 @@ function Registration() {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [discipline, setDiscipline] = useState("");
-    const [rollnum, setRollnum] = useState();
+    const [rollnum, setRollnum] = useState("");
+    const {toast, showToast} = useToast();
 
     async function getDisciplines() {
         try {
@@ -20,6 +23,10 @@ function Registration() {
 
         } catch(err) {
             console.error(err);
+            showToast({
+                message: "Internal server error",
+                type: "error"
+            })
         }
     }
 
@@ -29,19 +36,75 @@ function Registration() {
 
     async function handleSubmit(e) {
         e.preventDefault();
-        console.log("Submitting...");
+        const normalizedEmail = email.trim().toLowerCase();
+        const normalizedUsername = username.trim();
+        if (!normalizedUsername) {
+            showToast({
+                message: "Username required.",
+                type: "error"
+            })
+            return;
+        }
 
+        if (!normalizedEmail) {
+            showToast({
+                message: "Email required.",
+                type: "error"
+            })
+            return;
+        }
+
+        if (!normalizedEmail.endsWith("@iitgn.ac.in")) {
+            showToast({
+                message: "Please register using your IITGN email address.",
+                type: "error"
+            })
+            return;
+        }
+
+        if(!/^\d{8}$/.test(rollnum)) {
+            showToast({
+                message: "Roll number should contain exactly 8 digits",
+                type: "error"
+            })
+            return;
+        }
+
+        if(!password) {
+            showToast({
+                message: "Password required.",
+                type: "error"
+            })
+            return;
+        }
+
+        if (password.length < 8) {
+            showToast({
+                message: "Password must be at least 8 characters long.",
+                type: "error"
+            });
+            return;
+        }
+
+        if (!confirmPassword) {
+            showToast({
+                message: "Confirm password required.",
+                type: "error"
+            })
+            return;
+        }
         if (password !== confirmPassword) {
-            alert("password do not match!");
+            showToast({
+                message: "Passwords do not match!",
+                type: "error"
+            })
             return;
         }
         if (!discipline) {
-            alert("Please select your discipline");
-            return;
-        }
-
-        if (!email.trim().toLowerCase().endsWith("@iitgn.ac.in")) {
-            alert("Please register using your IITGN email address.");
+            showToast({
+                message: "Select your discipline.",
+                type: "error"
+            })
             return;
         }
 
@@ -54,8 +117,8 @@ function Registration() {
             },
             credentials: "include",
             body: JSON.stringify({
-                username: username.trim(),
-                email: email.trim().toLowerCase(),
+                username: normalizedUsername,
+                email: normalizedEmail,
                 password: password,
                 disciplineId: discipline,
                 rollnum
@@ -64,17 +127,26 @@ function Registration() {
         const data = await res.json();
 
         if (!res.ok) {
-            alert(data.error);
+            showToast({
+                message: `${data.error}`,
+                type: "error"
+            })
             return;
         }
         navigate("/login");
+        
         } catch(err) {
             console.error(err);
+            showToast({
+                message: "Internal server error",
+                type: "error"
+            })
         }
     }
 
     return(<div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50
 to-indigo-100 flex justify-center items-center">
+    {toast && <Toast toast={toast}/>}
     <div className="bg-white rounded-2xl p-10 shadow-2xl">
         <h1 className="text-2xl font-bold">Smart Track</h1>
       <h3 className="mb-3 text-gray-400">Academic Planning Made Simple</h3>
@@ -83,37 +155,37 @@ to-indigo-100 flex justify-center items-center">
             <input className="block w-full border border-gray-400 focus:border-blue-400 focus:ring-2 
             focus:ring-blue-200 my-2 transition rounded-lg py-2 px-3" 
             
-            required type="text" value={username} placeholder="Username"
+            type="text" value={username} placeholder="Username"
             onChange={(e) => setUsername(e.target.value)}/>
 
             <input className="block w-full border border-gray-400 focus:border-blue-400 focus:ring-2 
             focus:ring-blue-200 my-2 transition rounded-lg py-2 px-3" 
             
-            required type="email" value={email} placeholder="Email"
+            type="email" value={email} placeholder="Email"
             onChange={(e) => setEmail(e.target.value)}/>
 
             <input className="block w-full border border-gray-400 focus:border-blue-400 focus:ring-2 
             focus:ring-blue-200 my-2 transition rounded-lg py-2 px-3" 
             
-            minLength={8} maxLength={8} required type="text" placeholder="Roll number" value={rollnum}
+            type="text" placeholder="Roll number" value={rollnum}
             onChange={(e) => setRollnum(e.target.value)}/>
 
             <input className="block w-full border border-gray-400 focus:border-blue-400 focus:ring-2 
             focus:ring-blue-200 my-2 transition rounded-lg py-2 px-3" 
             
-            minLength={8} required type="password" value={password} placeholder="Password"
+            type="password" value={password} placeholder="Password"
             onChange={(e) => setPassword(e.target.value)}/>
 
             <input className="block w-full border border-gray-400 focus:border-blue-400 focus:ring-2 
             focus:ring-blue-200 my-2 transition rounded-lg py-2 px-3" 
             
-            minLength={8} required type="password" value={confirmPassword} placeholder="Confirm password"
+            type="password" value={confirmPassword} placeholder="Confirm password"
             onChange={(e) => setConfirmPassword(e.target.value)}/>
             
             <select className="block border border-gray-400 focus:border-blue-400 focus:ring-2 
             focus:ring-blue-200 my-2 transition rounded-lg py-2 px-2"
             
-            required value={discipline} onChange={(e) => setDiscipline(e.target.value)}>
+            value={discipline} onChange={(e) => setDiscipline(e.target.value)}>
 
                 <option value="" className="text-gray-600">Select your discipline</option>
                 {disciplines.map(d => 
@@ -121,7 +193,7 @@ to-indigo-100 flex justify-center items-center">
                 )}
             </select>
 
-            <button className="block mt-3 text-center w-full bg-blue-600 hover:bg-blue-700 rounded-lg py-2 px-3 text-white" 
+            <button className="block mt-3 text-center w-full bg-blue-600 hover:bg-blue-700 rounded-lg py-2 px-3 text-white cursor-pointer" 
             type="submit">Register</button>
 
             <p className="mt-3 text-center text-sm text-gray-600">

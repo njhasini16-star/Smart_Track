@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import useToast from "../hooks/useToast";
+import Toast from "../components/Toast";
 
 function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const {toast, showToast} = useToast();
 
   async function handleSubmit(e) {
 
@@ -12,11 +15,17 @@ function Login() {
 
     const normalizedEmail = email.trim().toLowerCase();
     if (!normalizedEmail) {
-      alert("email required");
+      showToast({
+        message: "Email required",
+        type: "error"
+      })
       return;
     } 
     if (!password) {
-      alert("Enter password");
+      showToast({
+        message: "Password required",
+        type: "error"
+      })
       return;
     }
     try {
@@ -33,17 +42,25 @@ function Login() {
     })
     const data = await res.json();
     if (!res.ok) {
-      alert(data.error);
+      showToast({
+        message: data.error,
+        type: "error"
+      })
       return;
   } 
     navigate("/");
 } catch(err) {
   console.error(err);
+  showToast({
+    message: "Unable to connect to the server",
+    type: "error"
+  })
 }
   }
 
   return(<div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50
 to-indigo-100 flex justify-center items-center">
+  {toast && <Toast toast={toast}/>}
     <div className="bg-white w-88 h-fit p-10 shadow-2xl rounded-2xl ">
       <h1 className="text-2xl font-bold">Smart Track</h1>
       <h3 className="mb-3 text-gray-400">Academic Planning Made Simple</h3>
@@ -51,18 +68,19 @@ to-indigo-100 flex justify-center items-center">
       <h3 className="mb-6">Sign in to continue.</h3>
   <form onSubmit={handleSubmit}>
     <div className="my-3">
-    <input required className="w-full border border-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-200 transition rounded-lg py-2 px-3" type="email" placeholder="Email" 
+    <input className="w-full border border-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-200 transition rounded-lg py-2 px-3" type="email" placeholder="Email" 
     value={email} onChange={(e) => setEmail(e.target.value)}/>
     </div>
     <div className="my-3">
-    <input className="w-full border border-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-200 transition rounded-lg py-2 px-3" required type="password" placeholder="Password"
+    <input className="w-full border border-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-200 transition rounded-lg py-2 px-3" type="password" placeholder="Password"
     value={password} onChange={(e) => setPassword(e.target.value)}/>
     </div>
-    <div className="mt-3 text-center w-full bg-blue-600 hover:bg-blue-700 rounded-lg py-2 px-3 text-white">
-    <input type="submit" value="Login"></input>
-    </div>
+    
+    <input className="mt-3 text-center w-full bg-blue-600 hover:bg-blue-700 rounded-lg py-2 px-3 text-white cursor-pointer"
+    type="submit" value="Login"></input>
+  
     <p className="mt-3 text-center text-sm text-gray-600">
-  New to Smart Tack?{" "}
+  New to Smart Track?{" "}
   <Link
     to="/register"
     className="font-medium text-blue-500 hover:text-blue-600 hover:underline"

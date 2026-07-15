@@ -3,9 +3,12 @@ import { useOutletContext } from "react-router-dom";
 import Search from "../components/search";
 import CourseTable from "../components/CourseTable";
 import { getPlannedCourses, addPlannedCourse, deletePlannedCourse } from "../api/PlannedCourses";
+import useToast from "../hooks/useToast";
+import Toast from "../components/Toast";
 
 function SemesterPlanning() {
   const { currentSem, disciplineCode} = useOutletContext();
+  const {toast, showToast} = useToast();
 
   const [selectedSem, setSelectedSem] = useState(currentSem+1)
   const [refreshBasketCredits, setRefreshBasketCredits] = useState(0);
@@ -51,24 +54,46 @@ function SemesterPlanning() {
 
       await fetchPlannedCourses();
 
+      showToast({
+        message: `Added ${course.course_code || course.name } to 
+        ${activeFilter === "All / Open Electives" ? "Open Electives" : activeFilter}.`,
+
+        type: "success"
+      })
+
       setRefreshBasketCredits(prev => prev +1);
     } catch(err) {
       console.error(err);
+
+      showToast({
+        message: `Failed to add ${course.course_code || course.name }`,
+        type: "error"
+      })
     }}
 
-async function handleDeleteCourse(courseId) {
+async function handleDeleteCourse(course) {
   try {
-      await deletePlannedCourse(courseId);
+      await deletePlannedCourse(course.id);
       await fetchPlannedCourses();
+ 
+      showToast({
+        message: `Removed ${course.course_code || course.name}.`,
+        type: "info"
+      })
       setRefreshBasketCredits(prev => prev + 1)
     } catch(err) {
       console.error(err);
+
+      showToast({
+        message: `Failed to remove ${course.course_code || course.name}.`,
+        type: "error"
+      })
     }}
   
   return (<div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
     <div className="lg:ml-60 mx-3 ">
       <div className="pseudo"></div>
-    
+    {toast && <Toast toast={toast}/>}
     <h1 className="my-2 text-3xl font-bold">Semester-Planning</h1>
     <div className="flex lg:flex-col mt-3">
     <div className="timeline inline-flex flex-col lg:flex-row items-center w-fit absolute mt-0">
