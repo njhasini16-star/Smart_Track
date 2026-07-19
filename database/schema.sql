@@ -45,4 +45,27 @@ CREATE TABLE user_courses (
     PRIMARY KEY (user_id, course_id)
 );
 
+CREATE TABLE course_offerings (
+    id SERIAL PRIMARY KEY,
+    course_id INT NOT NULL REFERENCES courses(id),
+    academic_year VARCHAR(10) NOT NULL,
+    term VARCHAR(2) NOT NULL,
+    language CHAR(1) NOT NULL CHECK (language IN ('E', 'H')),
+
+    UNIQUE (course_id, academic_year, term, language)
+);
+
+CREATE TABLE time_slots (
+    code VARCHAR(2) PRIMARY KEY,
+    day_of_week VARCHAR(10) NOT NULL,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL
+);
+
+CREATE TABLE offering_schedule (
+    offering_id INTEGER NOT NULL REFERENCES course_offerings(id),
+    slot_code VARCHAR(2) NOT NULL REFERENCES time_slots(code),
+
+    PRIMARY KEY (offering_id, slot_code)
+);
 

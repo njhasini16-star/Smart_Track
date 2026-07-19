@@ -508,6 +508,55 @@ app.get('/baskets', async (req, res) => {
     }
 });
 
+app.get('/time-slots', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT * FROM time_slots`)
+    
+    res.json(result.rows);
+  } catch(err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+})
+
+app.get('/course-offerings', async (req, res) => {
+  const { academic_year, term } = req.query;
+  try {
+    const result = await pool.query(`
+      SELECT 
+      co.id,
+      co.course_id,
+      c.course_code,
+      c.name AS course,
+      co.academic_year,
+      co.term,
+      co.language,
+      ARRAY_AGG(os.slot_code ORDER BY os.slot_code) AS slots
+      FROM course_offerings co
+      JOIN courses c
+      ON c.id = co.course_id
+      JOIN offering_schedule AS os
+      ON os.offering_id = co.id
+      WHERE co.academic_year = $1
+        AND co.term = $2
+      GROUP BY
+        co.id,
+        co.course_id,
+        c.course_code,
+        c.name,
+        co.term,
+        co.academic_year,
+        co.language
+      ORDER BY c.course_code;
+      `, [academic_year, term]);
+      res.json(result.rows);
+  } catch(err) {
+    console.error(err);  
+    res.status(500).json({ error: "Internal server error" });
+  }
+})
+
 app.listen(port, () => {
     console.log(`My express server is finally setup on port ${port}!`)
 })

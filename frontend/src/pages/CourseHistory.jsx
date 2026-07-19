@@ -9,7 +9,7 @@ function CourseHistory() {
   
   useEffect(() => {
     if (location.pathname === "/course-history") {
-      navigate(`/course-history/${currentSem}`, { replace: true });
+      navigate(`/course-history/${currentSem - 1}`, { replace: true });
     }
   }, [currentSem, location.pathname, navigate]);
 
@@ -21,7 +21,7 @@ function CourseHistory() {
       <nav className="timeline inline-flex flex-col lg:flex-row items-center w-fit absolute" style={{ "--progress": `${((currentSem - 1) / 7) * 100}%` }}>
         {Array.from({ length: 8 }, (_, i) => {
   const semester = i + 1;
-  const isFuture = semester > currentSem;
+  const isFuture = semester >= currentSem;
 
   return isFuture ? (
     <div

@@ -1,29 +1,3 @@
-INSERT INTO users (email, username, discipline_id, password_hash)
-VALUES
-('hasini@example.com', 'hasini', 4, 'xyz');
-
-
-INSERT INTO baskets (name)
-VALUES
-('Institute level Courses'),
-('Discipline Core Courses'),
-('Discipline Electives'),
-('HSS Basket'),
-('Math Basket'),
-('Materials Basket'),
-('Science Basket');
-
-INSERT INTO disciplines (code, name)
-VALUES
-('AI', 'Artificial Intelligence'),
-('CL', 'Chemical Engineering'),
-('CE', 'Civil Engineering'),
-('CSE', 'Computer Science Engineering'),
-('EE', 'Electrical Engineering'),
-('ICDT', 'Integrated Circuit Design and Technology'),
-('MSE', 'Material Science Engineering'),
-('ME', 'Mechanical Engineering');
-
 INSERT INTO courses (course_code, name, credits)
 VALUES 
 ('ES 101', 'Engineering Graphics', 3),
