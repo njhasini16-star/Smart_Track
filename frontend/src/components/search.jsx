@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { getCourses } from "../api/courses";
 import { getAllCompletedCourses } from "../api/completedCourses";
 import { getAllPlannedCourses } from "../api/PlannedCourses";
+import { getBaskets } from "../api/baskets";
 import { calculateBasketCredits } from "../utils/basketCredits";
 
 function Search({discipline, onSelectCourse, mode, refreshBasketCredits}) {
@@ -82,10 +83,8 @@ function Search({discipline, onSelectCourse, mode, refreshBasketCredits}) {
   
   useEffect(() => {
         async function fetchBaskets() {
-          const API_URL = import.meta.env.VITE_API_URL;
           try {
-            const res = await fetch(`${API_URL}/baskets`);
-            const data = await res.json();
+            const data = await getBaskets();
             setFilters([
             "All / Open Electives",
             ...data
@@ -95,21 +94,31 @@ function Search({discipline, onSelectCourse, mode, refreshBasketCredits}) {
           console.error(err);
         }
       } fetchBaskets();}, [])
+
     useEffect(() => {
       async function fetchBasketWiseCourses() {
-  try {
-  const completed = await getAllCompletedCourses();
-  setCompleted(completed);
-  const planned = await getAllPlannedCourses();
-  setPlanned(planned);
+        try {
+          const [completed, planned] = await Promise.all([
+            getAllCompletedCourses(),
+            getAllPlannedCourses()
+          ]);
 
-setBasketWiseCredits(calculateBasketCredits(completed, planned, filters));
+          setCompleted(completed);
+          setPlanned(planned);
 
-  } catch(err) {
-    console.error(err);
-  }
-} fetchBasketWiseCourses();} ,[filters, refreshBasketCredits]
+        } catch(err) {
+          console.error(err);
+        }
+      } fetchBasketWiseCourses();} ,[refreshBasketCredits]
     )
+
+    useEffect(() => {
+      if (filters.length === 0) return;
+
+      setBasketWiseCredits(
+        calculateBasketCredits(completed, planned, filters)
+      );
+    }, [completed, planned, filters]);
 
   const plannedCourseIds =  planned.map( plannedCourse => plannedCourse.id);
   const completedCourseIds = completed.map( completedCourse => completedCourse.course_id);

@@ -6,6 +6,7 @@ import { getPlannedCourses, addPlannedCourse, deletePlannedCourse } from "../api
 import useToast from "../hooks/useToast";
 import Toast from "../components/Toast";
 import writeXlsxFile from "write-excel-file/browser";
+import { getCourseOfferings, getTimeSlots } from "../api/timetable";
 
 function SemesterPlanning() {
   const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
@@ -50,10 +51,9 @@ function SemesterPlanning() {
 
 async function fetchTimeSlots() {
     try {
-      const res = await fetch(`${API_URL}/time-slots`);
-      const data = await res.json();
-
+      const data = await getTimeSlots();
       setTimeSlots(data);
+
     } catch(err) {
       console.error(err);
 
@@ -76,9 +76,8 @@ async function fetchTimeSlots() {
 
       const term = currentSem%2 !== 0 ? "I" : "II";
 
-      const res = await fetch(`${API_URL}/course-offerings?academic_year=${academicYear}&term=${term}`);
-      const data = await res.json();
-
+      const data = await getCourseOfferings(academicYear, term);
+    
       setCourseOfferings(data);
     } catch(err) {
       console.error(err);
@@ -363,7 +362,7 @@ async function fetchTimeSlots() {
 
         type: "success"
       })
-
+      console.log(plannedSemesters[selectedSem])
       setRefreshBasketCredits(prev => prev +1);
     } catch(err) {
       console.error(err);

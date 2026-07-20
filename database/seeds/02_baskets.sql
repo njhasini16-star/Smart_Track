@@ -6,4 +6,5 @@ VALUES
 ('HSS Basket'),
 ('Math Basket'),
 ('Materials Basket'),
-('Science Basket');
+('Science Basket'),
+('Open Electives');
