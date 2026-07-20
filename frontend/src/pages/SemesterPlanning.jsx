@@ -5,6 +5,7 @@ import CourseTable from "../components/CourseTable";
 import { getPlannedCourses, addPlannedCourse, deletePlannedCourse } from "../api/PlannedCourses";
 import useToast from "../hooks/useToast";
 import Toast from "../components/Toast";
+import writeXlsxFile from "write-excel-file/browser";
 
 function SemesterPlanning() {
   const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
@@ -93,7 +94,7 @@ async function fetchTimeSlots() {
   )); 
   const slotCourses = {};
 
-timetableCourses.forEach(course => {
+  timetableCourses.forEach(course => {
   course.slots.forEach(slotCode => {
     if (!slotCourses[slotCode]) {
       slotCourses[slotCode] = [];
@@ -112,8 +113,74 @@ timetableCourses.forEach(course => {
     return uniqueCourses.size > 1;
   });
 
-  console.log(conflicts);
+ async function exportPlannedCourses() {
+  try {
+    const headerStyle = {
+      fontWeight: "bold",
+      textColor: "#FFFFFF",
+      backgroundColor: "#475569",
+      align: "center",
+      alignVertical: "center",
+      borderColor: "#1E293B",
+      borderStyle: "thin",
+      height: 25
+}; 
+    const bodyStyle = {
+      backgroundColor: "#F8FAFC",
+      alignVertical: "center",
+      borderColor: "#1E293B",
+      borderStyle: "thin",
+      height: 25
+    }
+    const rows = [
+      [
+        {value: "Code", ...headerStyle},
+        {value: "Course", ...headerStyle},
+        {value: "Credits", ...headerStyle},
+        {value: "Basket", ...headerStyle}
+      ]
+    ]
+    plannedSemesters[selectedSem].forEach(course => {
+      rows.push([
+        {value: course.course_code, align: "center", ...bodyStyle},
+        {value: course.name, align: "left", ...bodyStyle},
+        {value: course.credits, align: "center", ...bodyStyle},
+        {value: course.basket, align: "left", ...bodyStyle}
+      ]);
+    })
+    const object = await writeXlsxFile(rows, {
+      filePath: "planned-courses.xlsx",
+      sheet: "Planned Courses",
+      columns: [
+        { width: 10 },
+        { width: 50 }, 
+        { width: 10 }, 
+        { width: 25 }  
+      ]
+    });
+    const blob = await object.toBlob();
 
+    const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `semester-${selectedSem}-planned-courses.xlsx`;
+
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+
+  URL.revokeObjectURL(url);
+
+     console.log("3. File exported");
+  } catch(err) {
+    console.log(err);
+    showToast({
+      message: "Could not export as excel.",
+      type: "error"
+    });
+  }
+  }
 
   useEffect(() => {
   fetchPlannedCourses();
@@ -130,6 +197,103 @@ timetableCourses.forEach(course => {
     });
   }
 }, [conflicts.length, showTimetable]);
+  
+  async function exportTimetable() {
+    const horizontalHeaderStyle = {
+      textColor: "#ffffff",
+      backgroundColor: "#475569",
+      fontWeight: "bold",
+      align: "center",
+      alignVertical: "center",
+      height: 20,
+      borderColor: "#1E293B",
+      borderStyle: "thin"
+    }
+    const verticalHeaderStyle = {
+      backgroundColor: "#94A3B8",
+      fontWeight: "bold",
+      align: "center",
+      alignVertical: "center",
+      borderColor: "#1E293B",
+      borderStyle: "thin"
+    }
+
+    const bodyStyle = {
+      align: "center",
+      alignVertical: "center",
+      borderColor: "#1E293B",
+      borderStyle: "thin",
+      wrap: true,
+      height: 50
+    }
+
+  const rows = [];
+  const headerRow = [
+    { value: "", ...horizontalHeaderStyle}
+  ];
+
+  timeSlots.slice(0, 6).forEach(slot => {
+    headerRow.push({
+      value: `${slot.start_time.slice(0, 5)} - ${slot.end_time.slice(0, 5)}`,
+      ...horizontalHeaderStyle
+    });
+  });
+
+  rows.push(headerRow);
+
+  // Timetable rows
+  days.forEach((day, index) => {
+    const row = [
+      {
+        value: day,
+        ...verticalHeaderStyle
+      }
+    ];
+
+    timeSlots
+      .slice(index * 6, 6 + index * 6)
+      .forEach(slot => {
+        const courses = slotCourses[slot.code] || [];
+
+        row.push({
+          value: courses
+            .map(course => `${course.course_code} (${course.language})`)
+            .join("\n"),
+            backgroundColor: `${conflicts.find(conflict => conflict[0]===slot.code) ? "#FEE2E2" : "#F8FAFC"}`,
+            ...bodyStyle
+        });
+      });
+
+    rows.push(row);
+  });
+
+  const object = await writeXlsxFile(rows, {
+    sheet: "Timetable",
+    columns: [
+      {width: 10},
+      {width: 20},
+      {width: 20},
+      {width: 20},
+      {width: 20},
+      {width: 20},
+      {width: 20}
+    ]
+  });
+
+  const blob = await object.toBlob();
+
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `semester-${selectedSem}-timetable.xlsx`;
+
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+
+  URL.revokeObjectURL(url);
+}
 
     function Timetable() {
       return(
@@ -174,7 +338,7 @@ timetableCourses.forEach(course => {
   </tbody>
 </table>
 </div>
-          
+          <button onClick={exportTimetable} className="text-blue-600 p-1 mx-3 cursor-pointer">Export as Excel</button>
           </div>
         </div>
       );
@@ -248,6 +412,7 @@ async function handleDeleteCourse(course) {
       <h2 className="py-2 mx-3 bg-slate-200 w-fit px-4 my-3 rounded-full border border-slate-600 text-slate-600"> {creditLoad} Credits</h2>
       <Search onSelectCourse={handleAddCourse} discipline={disciplineCode} mode="Planned" refreshBasketCredits={refreshBasketCredits}/>
       <div className="m-3">
+        <button onClick={exportPlannedCourses} className="text-blue-600 p-1 cursor-pointer">Export as Excel</button>
       <CourseTable courses= {plannedSemesters[selectedSem]} onDelete={handleDeleteCourse}/>
       </div>
     </div>
