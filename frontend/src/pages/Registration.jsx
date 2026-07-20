@@ -14,10 +14,11 @@ function Registration() {
     const [discipline, setDiscipline] = useState("");
     const [rollnum, setRollnum] = useState("");
     const {toast, showToast} = useToast();
+    const API_URL = import.meta.env.VITE_API_URL;
 
     async function getDisciplines() {
         try {
-        const res = await fetch("http://localhost:3000/disciplines");
+        const res = await fetch(`${API_URL}/disciplines`);
         const data = await res.json();
         setDisciplines(data);
 
@@ -110,7 +111,7 @@ function Registration() {
 
         try {
 
-        const res = await fetch("http://localhost:3000/register", {
+        const res = await fetch(`${API_URL}/register`, {
             method:'POST',
             headers: {
             "Content-Type": "application/json"

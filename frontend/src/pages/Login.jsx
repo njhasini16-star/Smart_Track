@@ -28,8 +28,9 @@ function Login() {
       })
       return;
     }
+    const API_URL = import.meta.env.VITE_API_URL;
     try {
-    const res = await fetch("http://localhost:3000/login", {
+    const res = await fetch(`${API_URL}/login`, {
       method: 'POST',
       credentials: 'include',
       headers: {

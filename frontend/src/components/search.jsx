@@ -82,8 +82,9 @@ function Search({discipline, onSelectCourse, mode, refreshBasketCredits}) {
   
   useEffect(() => {
         async function fetchBaskets() {
+          const API_URL = import.meta.env.VITE_API_URL;
           try {
-            const res = await fetch("http://localhost:3000/baskets");
+            const res = await fetch(`${API_URL}/baskets`);
             const data = await res.json();
             setFilters([
             "All / Open Electives",

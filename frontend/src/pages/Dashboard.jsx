@@ -27,7 +27,8 @@ function Dashboard() {
 
   async function Logout() {
     console.log("logout clicked");
-    const res = await fetch("http://localhost:3000/logout", {
+    const API_URL = import.meta.env.VITE_API_URL;
+    const res = await fetch(`${API_URL}/logout`, {
       method: 'POST',
       credentials: "include"
     })

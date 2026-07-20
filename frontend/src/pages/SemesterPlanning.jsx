@@ -19,6 +19,8 @@ function SemesterPlanning() {
   const [courseOfferings, setCourseOfferings] = useState([]);
   const [showTimetable, setShowTimetable] = useState(false);
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   const [plannedSemesters, setPlannedSemesters] = useState(() => {
     const semesters = {};
 
@@ -48,7 +50,7 @@ function SemesterPlanning() {
 
 async function fetchTimeSlots() {
     try {
-      const res = await fetch('http://localhost:3000/time-slots');
+      const res = await fetch(`${API_URL}/time-slots`);
       const data = await res.json();
 
       setTimeSlots(data);
@@ -74,7 +76,7 @@ async function fetchTimeSlots() {
 
       const term = currentSem%2 !== 0 ? "I" : "II";
 
-      const res = await fetch(`http://localhost:3000/course-offerings?academic_year=${academicYear}&term=${term}`);
+      const res = await fetch(`${API_URL}/course-offerings?academic_year=${academicYear}&term=${term}`);
       const data = await res.json();
 
       setCourseOfferings(data);

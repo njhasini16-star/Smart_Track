@@ -8,8 +8,9 @@ function ProtectedRoute() {
 
   useEffect(() => {
     async function loadData() {
+      const API_URL = import.meta.env.VITE_API_URL;
     try {
-      const userRes = await fetch("http://localhost:3000/me", {
+      const userRes = await fetch(`${API_URL}/me`, {
         credentials: "include",
       });
 

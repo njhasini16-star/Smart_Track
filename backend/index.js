@@ -10,21 +10,17 @@ const saltRounds = 10;
 const cookieParser = require("cookie-parser");
 app.use(cookieParser());
 
-const port = 3000;
+const port = process.env.PORT || 3000;
 const { Pool } = require('pg');
 
 app.use(cors({
-    origin: "http://localhost:5173",
-    credentials: true,
+  origin: process.env.FRONTEND_URL,
+  credentials: true,
 }));
 app.use(express.json());
 
 const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'smarttrack',
-  password: 'postgresql@93901',
-  port: 5432,
+  connectionString: process.env.DATABASE_URL,
 });
 
 const JWT_secret = process.env.JWT_secret;
