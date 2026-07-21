@@ -5,7 +5,7 @@ import DonutChart from "../components/DonutChart";
 import SemSummary from "../components/SemSumTable";
 import AcademicProgress from "../components/AcademicProgress";
 import { getAllCompletedCourses } from "../api/completedCourses";
-import { getAllPlannedCourses } from "../api/PlannedCourses";
+import { getAllPlannedCourses } from "../api/plannedCourses";
 
 function Dashboard() {
   const context = useOutletContext();

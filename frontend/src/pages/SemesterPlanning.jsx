@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import Search from "../components/search";
 import CourseTable from "../components/CourseTable";
-import { getPlannedCourses, addPlannedCourse, deletePlannedCourse } from "../api/PlannedCourses";
+import { getPlannedCourses, addPlannedCourse, deletePlannedCourse } from "../api/plannedCourses";
 import useToast from "../hooks/useToast";
 import Toast from "../components/Toast";
 import writeXlsxFile from "write-excel-file/browser";

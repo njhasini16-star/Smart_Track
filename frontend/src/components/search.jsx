@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { getCourses } from "../api/courses";
 import { getAllCompletedCourses } from "../api/completedCourses";
-import { getAllPlannedCourses } from "../api/PlannedCourses";
+import { getAllPlannedCourses } from "../api/plannedCourses";
 import { getBaskets } from "../api/baskets";
 import { calculateBasketCredits } from "../utils/basketCredits";
 
