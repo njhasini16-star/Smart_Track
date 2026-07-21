@@ -5,7 +5,7 @@ function ProtectedRoute() {
     const [user, setUser] = useState();
     const [loading, setLoading] = useState(true);
     const [disciplines, setDisciplines] = useState([]);
-
+       
   useEffect(() => {
     async function loadData() {
       const API_URL = import.meta.env.VITE_API_URL;
@@ -21,7 +21,7 @@ function ProtectedRoute() {
       const userData = await userRes.json();
       setUser(userData);
     
-      const disciplinesRes = await fetch("http://localhost:3000/disciplines");
+      const disciplinesRes = await fetch(`${API_URL}/disciplines`);
 
       if (!disciplinesRes.ok) {
         return;
