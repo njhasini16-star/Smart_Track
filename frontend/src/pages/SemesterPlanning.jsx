@@ -392,11 +392,11 @@ async function handleDeleteCourse(course) {
       })
     }}
   
-  return (<div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+  return (
     <div className="lg:ml-60 mx-3 ">
-      <div className="pseudo"></div>
+      <div className="pseudo hidden md:block"></div>
     {toast && <Toast toast={toast}/>}
-    <h1 className="my-2 text-3xl font-bold">Semester-Planning</h1>
+    <h1 className="py-2 text-3xl font-bold">Semester-Planning</h1>
     <div className="flex lg:flex-col mt-3">
     <div className="timeline inline-flex flex-col lg:flex-row items-center w-fit absolute mt-0">
       {Array.from({ length: 8-currentSem +1 }, (_, i) => (<button key={i}
@@ -422,7 +422,6 @@ async function handleDeleteCourse(course) {
     </div> 
     </div>
     </div>
-  </div>
   </div>);
   
 }

@@ -177,7 +177,7 @@ function BasketDetails({basket}) {
   </colgroup>
       <thead >
         <tr>
-          <th colspan={4} className="bg-slate-600 text-white">Completed Courses</th>
+          <th colSpan={4} className="bg-slate-600 text-white">Completed Courses</th>
         </tr>
       <tr className="bg-slate-600 text-white">
         <th >Code</th>
@@ -208,7 +208,7 @@ function BasketDetails({basket}) {
   </colgroup>
       <thead>
         <tr>
-          <th colspan={3} className="bg-slate-600 text-white">Remaining Courses</th>
+          <th colSpan={3} className="bg-slate-600 text-white">Remaining Courses</th>
         </tr>
       <tr className="bg-slate-600 text-white">
         <th className="w-23">Code</th>
@@ -231,11 +231,12 @@ function BasketDetails({basket}) {
   );
 }
 
-  return (<div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+  return (
   <div className="lg:ml-55 xl:ml-60">
     <div className="mx-3 lg:ml-0 xl:ml-0 xl:mr-7">
-    <div className="pseudo"></div>
-    <h1 className="text-3xl font-bold my-3">Basket-Tracking</h1>
+
+      <div className="pseudo hidden md:block"></div>
+    <h1 className="text-3xl font-bold py-3">Basket-Tracking</h1>
       
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 md:gap-3 sm:gap-6 gap-4">
         {baskets.map(basket => 
@@ -244,7 +245,6 @@ function BasketDetails({basket}) {
       </div>
       <BasketDetails basket={selectedBasket}/>
       </div>
-    </div>
     </div>);
 }
 export default BasketTracking;

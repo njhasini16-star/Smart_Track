@@ -13,8 +13,8 @@ function CourseHistory() {
     }
   }, [currentSem, location.pathname, navigate]);
 
-  return (<div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-    <div className="pseudo"></div>
+  return ( <>
+    <div className="pseudo hidden md:block"></div>
     <div className="lg:ml-55">
       <h1 className="text-3xl font-bold p-2">Course-History</h1>
       <div className="flex m-5 lg:flex-col">
@@ -48,6 +48,6 @@ function CourseHistory() {
       </div>
       </div>
     </div>
-    </div>);
+    </>);
 }
 export default CourseHistory;

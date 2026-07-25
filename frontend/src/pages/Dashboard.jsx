@@ -26,7 +26,6 @@ function Dashboard() {
      "EE":173, "ICDT":173, "MSE":173, "ME":173};
 
   async function Logout() {
-    console.log("logout clicked");
     const API_URL = import.meta.env.VITE_API_URL;
     const res = await fetch(`${API_URL}/logout`, {
       method: 'POST',
@@ -142,17 +141,12 @@ data.forEach(course => {
 
   const cgpa = (GradePointGrandTotal / GrandTotalValidCredits).toFixed(2);
   const remainingCredits = GraduationRequirements[discipline] - TotalCompletedCredits - plannedCredits;
-  console.log({
-  completed: TotalCompletedCredits,
-  pending: plannedCredits,
-  remaining: 30
-});
+
   return (<>
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-    <div className="pseudo w-auto"></div>
-    <div className="m-2 flex flex-col lg:ml-60">
+    <div className="pseudo hidden md:block"></div>
+    <div className="p-2 flex flex-col lg:ml-60">
     <div className="flex content-end">
-    <h1 className="py-2 text-3xl font-bold">Smart Track Dashboard</h1>
+    <h1 className="py-2 text-3xl font-bold">Dashboard</h1>
     <h1 className="text-xl ml-auto py-2 mt-auto">Welcome, {user.username}</h1>
     </div>
     <div className="flex">
@@ -164,7 +158,6 @@ data.forEach(course => {
     <DonutChart completed={TotalCompletedCredits} remaining={remainingCredits} pending={plannedCredits}/>  
     <AcademicProgress core={coreCredits} electives={electiveCredits} baskets={otherBasketCredits} cgpa={cgpa}/>
     <SemSummary args={semInfo}/>
-    </div>
     </div>
     </div>
     </>

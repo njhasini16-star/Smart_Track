@@ -43,7 +43,7 @@ function CourseTable({courses, onDelete}) {
         <td className="p-1"><span className={`${basketProperties[course.basket].tailwind} p-2 rounded-full`}>{basketProperties[course.basket].shortform}</span></td>
         <td className="text-center">{course.grade || '-'}</td>
         <td><button onClick={() => onDelete(course)} className="text-red-600 hover:cursor-pointer">Delete</button></td>
-        </tr>)):<tr> <td className="text-gray-500 bg-white" colSpan={6}>No courses yet <br/>Search and add courses above</td></tr>}
+        </tr>)):<tr><td className="text-gray-500 bg-white" colSpan={6}>No courses yet <br/>Search and add courses above</td></tr>}
       </tbody>
       </table>
 
