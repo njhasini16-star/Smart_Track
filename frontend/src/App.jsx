@@ -45,7 +45,8 @@ export default function App() {
           <div className='md:inline-block'>
           <ListChecks size={20} strokeWidth={2.2} />
           </div>
-        <div className='text-[10px] sm:text-xs md:text-[14px]'>BASKET TRACKING </div>
+        <div className='text-[10px] hidden sm:block sm:text-xs md:text-[14px] text-center'>BASKET TRACKING </div>
+        <div className='sm:hidden text-[10px]'>BASKETS</div>
       </NavLink>
 
       <NavLink 
@@ -58,7 +59,8 @@ export default function App() {
           <div className='md:inline-block'>
           <CalendarDays size={20} strokeWidth={2.2}/>
           </div>
-        <div className='text-[10px] sm:text-xs md:text-[14px]'>SEMESTER PLANNING</div>
+        <div className='hidden sm:block text-[10px] sm:text-xs md:text-[14px] text-center'>SEMESTER PLANNING</div>
+        <div className='sm:hidden text-[10px]'>PLANNING</div>
       </NavLink>
 
       <NavLink 
@@ -70,10 +72,11 @@ export default function App() {
           <div className='md:inline-block'>
           <History size={20} strokeWidth={2.2} />
           </div>
-        <div className='text-[10px] sm:text-xs md:text-[14px]'>COURSE HISTORY</div>
+        <div className='text-[10px] sm:text-xs md:text-[14px] text-center. hidden sm:block'>COURSE HISTORY</div>
+        <div className='sm:hidden text-[10px]'>HISTORY</div>
       </NavLink>
       </nav>
-      <main className="pb-18 overflow-y-auto min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      <main className="pb-18 md:pb-0 overflow-y-auto min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       <Outlet context={context}/>
       </main>
       </>

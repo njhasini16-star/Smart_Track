@@ -1,11 +1,12 @@
 import { Outlet, NavLink, useOutletContext, useNavigate, useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 function CourseHistory() {
   const context = useOutletContext(); 
   const {currentSem} = useOutletContext();
   const navigate = useNavigate();
   const location = useLocation();
+  const activeChipRef = useRef(null);
   
   useEffect(() => {
     if (location.pathname === "/course-history") {
@@ -13,12 +14,21 @@ function CourseHistory() {
     }
   }, [currentSem, location.pathname, navigate]);
 
+  useEffect(() => {
+  activeChipRef.current?.scrollIntoView({
+    behavior: 'smooth',
+    inline: 'center', 
+    block: 'nearest'  
+  });
+}, [location]);
+
   return ( <>
     <div className="pseudo hidden md:block"></div>
     <div className="lg:ml-55">
-      <h1 className="text-3xl font-bold p-2">Course-History</h1>
-      <div className="flex m-5 lg:flex-col">
-      <nav className="timeline inline-flex flex-col lg:flex-row items-center w-fit absolute" style={{ "--progress": `${((currentSem - 1) / 7) * 100}%` }}>
+      <h1 className="text-3xl font-extrabold p-2 tracking-tight font-[Manrope] mx-2">Course History</h1>
+      <div className="flex m-3 flex-col">
+        <div className="w-full overflow-x-auto p-2 pb-4 pt-3">
+      <nav className="timeline inline-flex flex-row items-center w-fit absolute" style={{ "--progress": `${((currentSem - 1) / 7) * 100}%` }}>
         {Array.from({ length: 8 }, (_, i) => {
   const semester = i + 1;
   const isFuture = semester >= currentSem;
@@ -26,24 +36,26 @@ function CourseHistory() {
   return isFuture ? (
     <div
       key={semester}
-      className="sem-link sem-link-future"
+      className="sem-link !text-base sem-link-future"
     >
-      Sem{semester}
+      S{semester}
     </div>
   ) : (
     <NavLink
       key={semester}
+      ref={"/course-history/" + semester === location.pathname  ? activeChipRef : null}
       to={`/course-history/${semester}`}
-      className={`sem-link ${
-        semester === currentSem ? "sem-link-current" : ""
+      className={`sem-link !text-base ${
+        "/course-history/" + semester === location.pathname ? "sem-link-current" : ""
       }`}
     >
-      Sem{semester}
+      S{semester}
     </NavLink>
   );
 })}
       </nav>
-      <div className="inline-flex lg:block h-fit w-fit ">
+      </div>
+      <div className="inline-flex lg:block h-fit w-full ">
         <Outlet context={context} />
       </div>
       </div>

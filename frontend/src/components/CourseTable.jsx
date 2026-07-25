@@ -24,7 +24,8 @@ function CourseTable({courses, onDelete}) {
       shortform: "Institute", tailwind: "bg-slate-100 text-slate-700"
   }};
 
-  return(<table className="rounded-xl overflow-hidden w-full border border-slate-600 table-fixed">
+  return(<div className="overflow-x-auto">
+    <table className="rounded-xl overflow-hidden w-full border border-slate-600 table-fixed min-w-130">
        <thead>
         <tr className="bg-slate-600 text-white ">
           <th className="w-21 !px-0">Code</th>
@@ -46,7 +47,7 @@ function CourseTable({courses, onDelete}) {
         </tr>)):<tr><td className="text-gray-500 bg-white" colSpan={6}>No courses yet <br/>Search and add courses above</td></tr>}
       </tbody>
       </table>
-
+      </div>
   );
 }
 

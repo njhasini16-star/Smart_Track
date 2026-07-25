@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useOutletContext } from "react-router-dom";
 import Search from "../components/search";
 import CourseTable from "../components/CourseTable";
@@ -21,6 +21,8 @@ function SemesterPlanning() {
   const [showTimetable, setShowTimetable] = useState(false);
 
   const API_URL = import.meta.env.VITE_API_URL;
+
+  const activeChipRef = useRef(null);
 
   const [plannedSemesters, setPlannedSemesters] = useState(() => {
     const semesters = {};
@@ -188,6 +190,14 @@ async function fetchTimeSlots() {
   fetchTimeSlots();
   fetchCourseOfferings();
 
+}, [selectedSem]);
+
+useEffect(() => {
+  activeChipRef.current?.scrollIntoView({
+    behavior: 'smooth',
+    inline: 'center', 
+    block: 'nearest'  
+  });
 }, [selectedSem]);
 
   useEffect(() => {
@@ -396,18 +406,20 @@ async function handleDeleteCourse(course) {
     <div className="lg:ml-60 mx-3 ">
       <div className="pseudo hidden md:block"></div>
     {toast && <Toast toast={toast}/>}
-    <h1 className="py-2 text-3xl font-bold">Semester-Planning</h1>
-    <div className="flex lg:flex-col mt-3">
-    <div className="timeline inline-flex flex-col lg:flex-row items-center w-fit absolute mt-0">
-      {Array.from({ length: 8-currentSem +1 }, (_, i) => (<button key={i}
+    <h1 className="py-2 text-3xl font-extrabold tracking-tight font-[Manrope]">Semester Planning</h1>
+    <div className="flex flex-col mt-3">
+    <div className="overflow-x-auto pt-2 px-2">
+    <div className="timeline inline-flex flex-shrink-0 flex-row items-center w-fit absolute mt-0 my-4 ">
+      {Array.from({ length: 8-currentSem +1 }, (_, i) => (<button key={i} ref={i+currentSem === selectedSem ? activeChipRef : null}
       className={`sem-link ${i+currentSem===selectedSem ? "sem-link-current" : !isPlanned(i+currentSem) ? "sem-link-future": ""}`}
       onClick={() => setSelectedSem(currentSem + i)}>
       Sem{currentSem + i}
     </button> )
   )}</div>
-    <div className="flex flex-col ml-6 lg:ml-0 mr-2 w-full">
+  </div>
+    <div className="flex flex-col w-full">
     <div className="mb-4 bg-white rounded-2xl border border-slate-600 overflow-hidden lg:my-4 xl:w-5/6">
-      <h2 className="bg-slate-600 text-white text-center py-1">Planned Courses</h2>
+      <h2 className="bg-slate-600 text-white text-center py-1">Planned Courses - Semester {selectedSem}</h2>
       {selectedSem==currentSem && <button onClick={() => setShowTimetable(true)} className="mx-3 text-right text-blue-600 cursor-pointer">View Timetable</button>}
       {showTimetable && <Timetable/>}
       <h2 className="py-2 mx-3 bg-slate-200 w-fit px-4 my-3 rounded-full border border-slate-600 text-slate-600"> {creditLoad} Credits</h2>

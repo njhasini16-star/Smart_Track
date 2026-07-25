@@ -153,7 +153,7 @@ useEffect(() => {
 
     return (<>
     {toast && <Toast toast={toast}/>}
-    <div className="ml-4 lg:mx-0 lg:my-8 bg-white rounded-2xl border border-slate-600 overflow-hidden">
+    <div className="lg:mx-0 lg:my-8 bg-white rounded-2xl border border-slate-600 overflow-hidden w-full">
       <div className="bg-slate-600 text-white py-1 text-center">Completed Courses - Semester {semId}</div>
         <div className="my-3">
         <Search onSelectCourse={handleAddCourse} discipline={disciplineCode} mode="Completed" refreshBasketCredits={refreshBasketCredits}/>

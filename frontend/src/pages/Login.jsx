@@ -49,6 +49,7 @@ function Login() {
       })
       return;
   } 
+    console.log("navigating...")
     navigate("/");
 } catch(err) {
   console.error(err);
