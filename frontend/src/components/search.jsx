@@ -159,7 +159,7 @@ function Search({discipline, onSelectCourse, mode, refreshBasketCredits}) {
   return(
     <div className="flex flex-col md:flex-row w-full p-3 gap-4">
 
-      <div className="inline-flex flex-col bg-slate-100 rounded-2xl overflow-hidden border border-slate-600">
+      <div className="inline-flex flex-col bg-slate-100 rounded-2xl overflow-hidden border border-slate-600 min-w-max">
         <div className="text-white bg-slate-600 text-center py-1">Basket Progress</div>
       {filters.map((filter) => ( 
         <button className={`block flex flex-row items-center text-left px-3 py-1 hover:bg-slate-400 hover:text-white hover:cursor-pointer ${activeFilter===filter && "bg-blue-500 text-white"}`} key={filter}
@@ -168,14 +168,14 @@ function Search({discipline, onSelectCourse, mode, refreshBasketCredits}) {
         </button>
       ))}
       </div>
-      <div className="inline-flex flex-col border border-slate-600 rounded-2xl bg-white overflow-hidden md:ml-auto h-fit">
+      <div className="inline-flex flex-col border border-slate-600 rounded-2xl bg-white overflow-hidden md:ml-auto h-fit ">
       <input type="text" value={search} placeholder="Search Course..." 
       onChange={(e) => setSearch(e.target.value)} 
       className="w-full ml-auto px-4 py-2 border-b border-slate-600 rounded-2xl focus:outline-none focus:border-t-1 focus:border-x-1 focus:border-b-2"/>
   
       <ul className="h-70 w-full overflow-y-auto inline-flex flex-col">
       {searchResults.map((course, idx) => (
-        <li key={idx} className="bg-white max-w-90 flex flex-col py-2 pl-2 border-b border-slate-600">
+        <li key={idx} className="bg-white flex flex-col py-2 pl-2 border-b border-slate-600">
 
           <div className="flex font-medium">{course.course_code || 'TBD'}
 

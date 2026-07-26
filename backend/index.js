@@ -105,7 +105,7 @@ app.post("/login", async (req, res) => {
     const token = jwt.sign(payload, JWT_secret, {
       expiresIn: "7d",
     });
-    console.log("Token created");
+    console.log("Token created")
 
     res.cookie("token", token, {
       httpOnly: true,

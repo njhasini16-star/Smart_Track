@@ -411,9 +411,9 @@ async function handleDeleteCourse(course) {
     <div className="overflow-x-auto pt-2 px-2">
     <div className="timeline inline-flex flex-shrink-0 flex-row items-center w-fit absolute mt-0 my-4 ">
       {Array.from({ length: 8-currentSem +1 }, (_, i) => (<button key={i} ref={i+currentSem === selectedSem ? activeChipRef : null}
-      className={`sem-link ${i+currentSem===selectedSem ? "sem-link-current" : !isPlanned(i+currentSem) ? "sem-link-future": ""}`}
+      className={`sem-link ${i+currentSem===selectedSem ? "sem-link-current" : !isPlanned(i+currentSem) ? "sem-link-future": ""} !text-base`}
       onClick={() => setSelectedSem(currentSem + i)}>
-      Sem{currentSem + i}
+      S{currentSem + i}
     </button> )
   )}</div>
   </div>
