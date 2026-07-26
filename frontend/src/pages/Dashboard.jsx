@@ -8,9 +8,8 @@ import { getAllCompletedCourses } from "../api/completedCourses";
 import { getAllPlannedCourses } from "../api/plannedCourses";
 
 function Dashboard() {
-  const context = useOutletContext();
-  const discipline = context.disciplineCode;
-  const user = context.user;
+  const {disciplineCode, user, currentSem, joiningYear} = useOutletContext();
+  const discipline = disciplineCode;
 
   const navigate = useNavigate();
   
@@ -78,15 +77,17 @@ data.forEach(course => {
   useEffect(() => {
     fetchCompletedCourses();
     fetchPlannedCredits();
+    console.log(semInfo)
   }, [])
   const semInfo = [];
 
-  Object.keys(completedCourses).forEach(sem => {
-  const validCourses = completedCourses[sem].filter(
+  Array.from({length:currentSem-1}, (_, i) => { 
+  if (completedCourses[i+1]) {
+  const validCourses = completedCourses[i+1].filter(
     course => course.grade !== "P" && course.grade !== "F"
   );
 
-  const totalCredits = completedCourses[sem].reduce(
+  const totalCredits = completedCourses[i+1].reduce(
     (sum, course) => sum + Number(course.credits),
     0
   );
@@ -105,13 +106,23 @@ data.forEach(course => {
   const rawGpa = totalGradePoints / GradePointCredits;
   
   semInfo.push({
-    sem,
+    sem: i+1,
     credits: totalCredits,
     rawGpa,
     gpa: rawGpa.toFixed(2),
     highlights: "none",
     validCredits: GradePointCredits
   });
+} else {
+  semInfo.push({
+    sem: i+1,
+    credits: NaN,
+    rawGpa: NaN,
+    gpa: NaN,
+    highlights: "none",
+    validCredits: NaN
+  })
+}
 });  
   const otherBaskets = Object.fromEntries(
   Object.entries(basketOverview).filter(
@@ -133,31 +144,38 @@ data.forEach(course => {
     0
   );
 
-  const GradePointGrandTotal = semInfo.reduce((sum, sem) => sum + Number(sem.rawGpa)*Number(sem.validCredits), 0);
+  const GradePointGrandTotal = semInfo.reduce((sum, sem) => sum + Number(sem.rawGpa===sem.rawGpa ? sem.rawGpa : 0)*Number(sem.validCredits ? sem.validCredits : 0), 0);
+  console.log(GradePointGrandTotal);
 
-  const GrandTotalValidCredits = semInfo.reduce((sum, sem) => sum + sem.validCredits, 0)
+  const GrandTotalValidCredits = semInfo.reduce(
+  (sum, sem) => sum + (Number.isNaN(sem.validCredits) ? 0 : sem.validCredits),
+  0
+);
 
-  const TotalCompletedCredits = semInfo.reduce((sum, sem) => sum + sem.credits, 0);
+const TotalCompletedCredits = semInfo.reduce(
+  (sum, sem) => sum + (Number.isNaN(sem.credits) ? 0 : sem.credits),
+  0
+);
 
   const cgpa = (GradePointGrandTotal / GrandTotalValidCredits).toFixed(2);
   const remainingCredits = GraduationRequirements[discipline] - TotalCompletedCredits - plannedCredits;
 
   return (<>
     <div className="pseudo hidden md:block"></div>
-    <div className="p-2 flex flex-col lg:ml-60">
-    <div className="flex content-end">
-    <h1 className="py-2 text-3xl font-bold">Dashboard</h1>
-    <h1 className="text-xl ml-auto py-2 mt-auto">Welcome, {user.username}</h1>
+    <div className="p-2 flex flex-col lg:ml-60 m-2">
+    <div className="flex content-end p-2 flex-col sm:flex-row gap-2 sm:gap-0">
+    <h1 className="text-3xl font-extrabold tracking-tight font-[Manrope]">Dashboard</h1>
+    <h1 className="md:text-xl sm:ml-auto sm:self-center sm:text-right text-lg">Welcome, {user.username}</h1>
     </div>
-    <div className="flex">
+    <div className="flex px-2">
     <h1 className="text-xl py-2" >Track your progress</h1>
     <button onClick={Logout} className="ml-auto block bg-slate-600 border text-white px-2 rounded-lg">Log out</button>
     </div>
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 lg:w-full lg:gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 lg:w-full lg:gap-4 my-4">
     
     <DonutChart completed={TotalCompletedCredits} remaining={remainingCredits} pending={plannedCredits}/>  
     <AcademicProgress core={coreCredits} electives={electiveCredits} baskets={otherBasketCredits} cgpa={cgpa}/>
-    <SemSummary args={semInfo}/>
+    <SemSummary args={semInfo} joiningYear={joiningYear}/>
     </div>
     </div>
     </>

@@ -74,6 +74,6 @@ currentSem = Math.max(1, Math.min(currentSem, 8));
 
 const disciplineCode = discipline?.code;
 
-    return(<Outlet context={{user, disciplineCode, currentSem}}/>);
+    return(<Outlet context={{user, disciplineCode, currentSem, joiningYear}}/>);
 }
 export default ProtectedRoute;

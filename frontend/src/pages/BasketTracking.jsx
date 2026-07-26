@@ -193,9 +193,9 @@ function BasketDetails({basket}) {
       <tbody>
         {completedCourses[basket]?.length > 0 ? 
   completedCourses[basket].map((course, idx) => <tr key = {idx}>
-    <td className="text-center text-sm md:text-base">{course.course_code}</td>
-    <td className="md:!px-3 md:!py-4 text-sm md:text-base">{course.name}</td>
-    <td className="text-center text-sm md:text-base">{course.credits}</td>
+    <td className="text-center text-sm md:text-base">{course.course_code || "TBD"}</td>
+    <td className="md:!px-3 md:!py-4 text-sm md:text-base">{course.name || "TBD"}</td>
+    <td className="text-center text-sm md:text-base">{course.credits || "TBD"}</td>
     <td className=" text-center text-sm md:text-base">{course.grade}</td>
   </tr> ) : <tr><td className="text-center text-sm md:text-base" colSpan={4}>No courses completed yet</td></tr>}
     </tbody>
@@ -223,9 +223,9 @@ function BasketDetails({basket}) {
       <tbody>
         {remaining.length > 0 ? 
   remaining.map((course, idx) => <tr key = {idx}>
-    <td className="text-center w-20 text-sm md:text-base">{course.course_code}</td>
-    <td className="md:!px-3 md:!py-3 text-sm md:text-base">{course.name}</td>
-    <td className=" text-center text-sm md:text-base">{course.credits}</td>
+    <td className="text-center w-20 text-sm md:text-base">{course.course_code || "TBD"}</td>
+    <td className="md:!px-3 md:!py-3 text-sm md:text-base">{course.name || "TBD"}</td>
+    <td className=" text-center text-sm md:text-base">{course.credits || "TBD"}</td>
   </tr> ) : <tr><td className="text-center text-sm md:text-base" colSpan={3}>No courses remaining</td></tr>}
     </tbody>
     </table>
@@ -240,9 +240,9 @@ function BasketDetails({basket}) {
     <div className="mx-3 lg:ml-0 xl:ml-0 xl:mr-7">
 
       <div className="pseudo hidden md:block"></div>
-    <h1 className="text-3xl font-extrabold py-3 tracking-tight font-[Manrope]">Basket-Tracking</h1>
+    <h1 className="text-3xl font-extrabold py-3 tracking-tight font-[Manrope]">Basket Tracking</h1>
       
-      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 md:gap-3 sm:gap-6 gap-2">
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 sm:gap-3 gap-2">
         {baskets.map(basket => 
           <Card key={basket} onClick={() => setSelectedBasket(basket)} basket={basket} selectedBasket={selectedBasket}/>
         )}

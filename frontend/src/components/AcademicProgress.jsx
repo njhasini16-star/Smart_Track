@@ -1,4 +1,4 @@
-function CreditProgressBar({group, groupName, groupTotal}) {
+function CreditProgressBar({group, groupName, short, groupTotal}) {
     const percentage = (group/groupTotal)*100;
 
     let colour;
@@ -13,8 +13,9 @@ function CreditProgressBar({group, groupName, groupTotal}) {
   }
   
     return(
-        <div className="p-2 border-t border-gray-200 border-b border-gray-200 flex items-center min-w-max ">
-            <div className="inline-flex flex-shrink-0 mr-3">{groupName}</div>
+        <div className="p-2 sm:px-3 border-t border-gray-200 border-b border-gray-200 flex items-center min-w-max ">
+            <div className="hidden sm:inline-flex flex-shrink-0 mr-3">{groupName}</div>
+            <div className="inline-flex flex-shrink-0 mr-3 sm:hidden">{short}</div>
   <div className="w-35 h-4 ml-auto bg-slate-300 rounded-full overflow-hidden">
   <div
     className={`h-full ${percentage >= 100 ? "rounded-full" : "rounded-l-full"} ${colour}`}
@@ -29,13 +30,15 @@ function CreditProgressBar({group, groupName, groupTotal}) {
     );
 }
 function AcademicProgress({core, electives, baskets, cgpa}) {
+  const zero = 0;
+  const zeroWithDecimals = zero.toFixed(2);
     return(
-    <div className="bg-white md:mt-8 shadow-2xl rounded-2xl overflow-hidden w-full h-fit border border-slate-600">
+    <div className="bg-white shadow-2xl rounded-2xl overflow-hidden w-full h-fit border border-slate-600">
         <h1 className="p-2 rounded-t-lg bg-slate-600 text-white text-center">Academic Progress</h1>
-        <h1 className="px-2 py-8 text-xl h-55">Overall CGPA:<div className="text-6xl my-4">{cgpa}</div></h1>
-        <CreditProgressBar group={core} groupName="Discipline Core" groupTotal={36}/>
-        <CreditProgressBar group={electives} groupName="Discipline Electives" groupTotal={30}/>
-        <CreditProgressBar group={baskets} groupName="Other Baskets" groupTotal={45}/>
+        <h1 className="px-2 py-8 text-xl h-55">Overall CGPA:<div className="text-6xl my-4">{ cgpa === "NaN" ? zeroWithDecimals : cgpa}</div></h1>
+        <CreditProgressBar group={core} groupName="Discipline Core" short="Core" groupTotal={36}/>
+        <CreditProgressBar group={electives} groupName="Discipline Electives" short="Electives" groupTotal={30}/>
+        <CreditProgressBar group={baskets} groupName="Other Baskets" short="Other" groupTotal={45}/>
         <div className="p-2">Alerts</div>
 
     </div>);

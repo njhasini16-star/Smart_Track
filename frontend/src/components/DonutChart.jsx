@@ -38,7 +38,7 @@ function Donut({completed, pending, remaining}) {
 
 
 function DonutChart({completed, pending, remaining}) {
-return(<div className="mt-8 shadow-2xl rounded-2xl border-1 border-slate-600">
+return(<div className="shadow-2xl rounded-2xl border-1 border-slate-600">
       <h1 className="bg-slate-600 p-2 text-center text-white rounded-t-2xl">Credit Overview</h1>
     <div className='relative'>
     <div className="bg-white p-0 leading-none h-60 flex items-center">
