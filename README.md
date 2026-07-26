@@ -1,16 +1,56 @@
-# React + Vite
+# SmartTrack
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A full-stack web application that helps IIT Gandhinagar students track graduation requirements, plan future semesters, and visualise their academic progress.
 
-Currently, two official plugins are available:
+## Features
+- JWT-based authentication
+- Dashboard with credit and CGPA analytics
+- Semester planning
+- Basket-wise graduation tracking
+- Timetable integration with conflict detection
+- Course history management
+- Responsive UI for desktop and mobile
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Tech Stack
+Frontend:
+- React
+- Vite
+- Tailwind CSS
+- React Router
 
-## React Compiler
+Backend:
+- Node.js
+- Express.js
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Database:
+- PostgreSQL
 
-## Expanding the ESLint configuration
+Authentication:
+- JWT
+- HTTP-only Cookies
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Screenshots
+
+<p align="center">
+  <img src="screenshots/register.png" width="45%">
+  <img src="screenshots/login.png" width="45%">
+</p>
+
+<p align="center">
+  <img src="screenshots/dashboard.png" width="45%">
+  <img src="screenshots/semester-planning.png" width="45%">
+</p>
+
+<p align="center">
+  <img src="screenshots/basket-tracking.png" width="45%">
+  <img src="screenshots/course-history.png" width="45%">
+</p>
+<p align="center">
+  <img src="screenshots/timetable.png" width="45%">
+</p>
+
+<p align="center">
+  <img src="screenshots/mobile-dashboard.png" width="30%">
+  <img src="screenshots/mobile-planning.png" width="30%">
+  <img src="screenshots/mobile-basket.png" width="30%">
+</p>
