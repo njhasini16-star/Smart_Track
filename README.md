@@ -2,6 +2,12 @@
 
 A full-stack web application that helps IIT Gandhinagar students track graduation requirements, plan future semesters, and visualise their academic progress.
 
+## Live Demo
+
+- 🌐 Live Application: https://smart-track-hazel.vercel.app/
+
+- 🎥 Demo Video: https://www.youtube.com/watch?v=W8GtHP38NNo
+
 ## Features
 - JWT-based authentication
 - Dashboard with credit and CGPA analytics
